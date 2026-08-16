@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://webpstudio.online";
+  const baseUrl = "https://thewebpstudio.com";
   const currentDate = new Date();
 
   // All high-intent routes

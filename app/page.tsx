@@ -3,7 +3,7 @@ import Link from "next/link";
 import WebpStudioWorkbench from "./components/WebpStudioWorkbench";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://webpstudio.online"),
+  metadataBase: new URL("https://thewebpstudio.com"),
   title: "WebP Studio – Free Online Batch WebP Converter & Image Compressor",
   description:
     "Convert PNG, JPG, JPEG, AVIF, HEIC, TIFF, BMP, and GIF to WebP online for free. Unlimited batch conversion, zero server uploads, 100% private in-browser canvas compression, interactive split-slider preview, and instant ZIP export.",
@@ -90,7 +90,7 @@ export const metadata: Metadata = {
     title: "WebP Studio – 100% Private In-Browser Batch WebP Converter",
     description:
       "Batch convert PNG, JPG, and AVIF to WebP directly in your browser with zero server uploads, split-slider preview, and instant ZIP download.",
-    url: "https://webpstudio.online",
+    url: "https://thewebpstudio.com",
     siteName: "WebP Studio",
     locale: "en_US",
     type: "website",
@@ -129,18 +129,18 @@ export default function Page() {
     "@graph": [
       {
         "@type": "Organization",
-        "@id": "https://webpstudio.online/#organization",
+        "@id": "https://thewebpstudio.com/#organization",
         name: "WebP Studio",
-        url: "https://webpstudio.online",
-        logo: "https://webpstudio.online/logo.svg",
+        url: "https://thewebpstudio.com",
+        logo: "https://thewebpstudio.com/logo.svg",
         description:
           "Zero-upload client-side web image optimization, compression, and conversion tools.",
       },
       {
         "@type": "WebApplication",
-        "@id": "https://webpstudio.online/#webapp",
+        "@id": "https://thewebpstudio.com/#webapp",
         name: "WebP Studio",
-        url: "https://webpstudio.online",
+        url: "https://thewebpstudio.com",
         applicationCategory: "MultimediaApplication",
         operatingSystem:
           "All modern web browsers (Chrome, Safari, Firefox, Edge, Opera, Chromium)",
@@ -165,25 +165,25 @@ export default function Page() {
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://webpstudio.online/#breadcrumbs",
+        "@id": "https://thewebpstudio.com/#breadcrumbs",
         itemListElement: [
           {
             "@type": "ListItem",
             position: 1,
             name: "Home",
-            item: "https://webpstudio.online",
+            item: "https://thewebpstudio.com",
           },
           {
             "@type": "ListItem",
             position: 2,
             name: "WebP Converter Workbench",
-            item: "https://webpstudio.online/#workbench",
+            item: "https://thewebpstudio.com/#workbench",
           },
         ],
       },
       {
         "@type": "HowTo",
-        "@id": "https://webpstudio.online/#howto",
+        "@id": "https://thewebpstudio.com/#howto",
         name: "How to Convert and Compress Images to WebP Format",
         description:
           "Step-by-step guide to converting PNG, JPG, and AVIF images to modern WebP format using WebP Studio.",
@@ -222,7 +222,7 @@ export default function Page() {
       },
       {
         "@type": "FAQPage",
-        "@id": "https://webpstudio.online/#faq",
+        "@id": "https://thewebpstudio.com/#faq",
         mainEntity: [
           {
             "@type": "Question",

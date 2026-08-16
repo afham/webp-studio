@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://webpstudio.online"),
+  metadataBase: new URL("https://thewebpstudio.com"),
   title: "About WebP Studio – Architecture, Mission & Client-Side Image Engine",
   description:
     "Learn about WebP Studio's browser-native architecture, our zero-upload privacy mission, and the engineering behind our high-speed client-side WebP image converter.",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "WebP Studio Engineering Team",
-      url: "https://webpstudio.online/about",
+      url: "https://thewebpstudio.com/about",
     },
   ],
   creator: "WebP Studio",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     title: "About WebP Studio – Privacy-First In-Browser Image Optimization",
     description:
       "Explore the engineering, privacy philosophy, and technical architecture powering WebP Studio's client-side batch image converter.",
-    url: "https://webpstudio.online/about",
+    url: "https://thewebpstudio.com/about",
     siteName: "WebP Studio",
     locale: "en_US",
     type: "website",
@@ -94,9 +94,9 @@ export default function AboutPage() {
     "@graph": [
       {
         "@type": "AboutPage",
-        "@id": "https://webpstudio.online/about/#aboutpage",
+        "@id": "https://thewebpstudio.com/about/#aboutpage",
         name: "About WebP Studio",
-        url: "https://webpstudio.online/about",
+        url: "https://thewebpstudio.com/about",
         description:
           "Technical background, privacy architecture, and optimization mission of WebP Studio.",
         mainEntity: {
@@ -113,35 +113,35 @@ export default function AboutPage() {
       },
       {
         "@type": "Organization",
-        "@id": "https://webpstudio.online/#organization",
+        "@id": "https://thewebpstudio.com/#organization",
         name: "WebP Studio",
-        url: "https://webpstudio.online",
-        logo: "https://webpstudio.online/icon.png",
+        url: "https://thewebpstudio.com",
+        logo: "https://thewebpstudio.com/icon.png",
         description:
           "Creators of zero-upload, client-side raster image optimization technologies.",
         sameAs: ["https://github.com/webpstudio"],
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://webpstudio.online/about/#breadcrumbs",
+        "@id": "https://thewebpstudio.com/about/#breadcrumbs",
         itemListElement: [
           {
             "@type": "ListItem",
             position: 1,
             name: "Home",
-            item: "https://webpstudio.online",
+            item: "https://thewebpstudio.com",
           },
           {
             "@type": "ListItem",
             position: 2,
             name: "About",
-            item: "https://webpstudio.online/about",
+            item: "https://thewebpstudio.com/about",
           },
         ],
       },
       {
         "@type": "FAQPage",
-        "@id": "https://webpstudio.online/about/#faq",
+        "@id": "https://thewebpstudio.com/about/#faq",
         mainEntity: [
           {
             "@type": "Question",

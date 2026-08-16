@@ -8,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
       },
     ],
-    sitemap: "https://webpstudio.online/sitemap.xml",
+    sitemap: "https://thewebpstudio.com/sitemap.xml",
   };
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://webpstudio.online"),
+  metadataBase: new URL("https://thewebpstudio.com"),
   title: "Privacy Policy – WebP Studio Zero-Upload Data Protection & Security",
   description:
     "Review WebP Studio's comprehensive Privacy Policy. Learn about our 100% client-side zero-upload image architecture, GDPR/CCPA compliance, cookies policy, and data protection standards.",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "WebP Studio Security & Privacy Team",
-      url: "https://webpstudio.online/privacy",
+      url: "https://thewebpstudio.com/privacy",
     },
   ],
   creator: "WebP Studio",
@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: "Privacy Policy – WebP Studio Zero-Upload Data Protection",
     description:
       "Understand how WebP Studio protects your photos and creative assets with 100% local, client-side browser processing.",
-    url: "https://webpstudio.online/privacy",
+    url: "https://thewebpstudio.com/privacy",
     siteName: "WebP Studio",
     locale: "en_US",
     type: "website",
@@ -83,40 +83,40 @@ export default function PrivacyPage() {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://webpstudio.online/privacy/#webpage",
+        "@id": "https://thewebpstudio.com/privacy/#webpage",
         name: "Privacy Policy – WebP Studio",
-        url: "https://webpstudio.online/privacy",
+        url: "https://thewebpstudio.com/privacy",
         description:
           "Comprehensive privacy policy, GDPR/CCPA declarations, and zero-upload security details for WebP Studio.",
         inLanguage: "en-US",
         isPartOf: {
           "@type": "WebSite",
-          "@id": "https://webpstudio.online/#website",
+          "@id": "https://thewebpstudio.com/#website",
           name: "WebP Studio",
-          url: "https://webpstudio.online",
+          url: "https://thewebpstudio.com",
         },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://webpstudio.online/privacy/#breadcrumbs",
+        "@id": "https://thewebpstudio.com/privacy/#breadcrumbs",
         itemListElement: [
           {
             "@type": "ListItem",
             position: 1,
             name: "Home",
-            item: "https://webpstudio.online",
+            item: "https://thewebpstudio.com",
           },
           {
             "@type": "ListItem",
             position: 2,
             name: "Privacy Policy",
-            item: "https://webpstudio.online/privacy",
+            item: "https://thewebpstudio.com/privacy",
           },
         ],
       },
       {
         "@type": "FAQPage",
-        "@id": "https://webpstudio.online/privacy/#faq",
+        "@id": "https://thewebpstudio.com/privacy/#faq",
         mainEntity: [
           {
             "@type": "Question",
@@ -218,7 +218,7 @@ export default function PrivacyPage() {
             <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
               At <strong>WebP Studio</strong> (accessible via{" "}
               <code className="text-indigo-600 font-mono bg-slate-100 px-1 py-0.5 rounded">
-                https://webpstudio.online
+                https://thewebpstudio.com
               </code>
               ), we prioritize user privacy above all else. Unlike conventional
               cloud-based converters that require uploading confidential images
@@ -538,7 +538,7 @@ export default function PrivacyPage() {
               to our privacy office at:
             </p>
             <p className="text-xs font-mono text-indigo-600 bg-slate-50 border border-slate-200 p-2.5 rounded-lg inline-block">
-              privacy@webpstudio.online
+              privacy@thewebpstudio.com
             </p>
           </section>
 

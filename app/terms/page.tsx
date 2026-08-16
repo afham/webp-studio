@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://webpstudio.online"),
+  metadataBase: new URL("https://thewebpstudio.com"),
   title: "Terms of Service – WebP Studio Legal Agreement & Usage Policy",
   description:
     "Review the WebP Studio Terms of Service. Understand our acceptable use guidelines, client-side zero-upload processing terms, intellectual property protections, and liability limitations.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "web performance tool terms",
   ],
   authors: [
-    { name: "WebP Studio Legal Team", url: "https://webpstudio.online/terms" },
+    { name: "WebP Studio Legal Team", url: "https://thewebpstudio.com/terms" },
   ],
   creator: "WebP Studio",
   publisher: "WebP Studio",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     title: "Terms of Service – WebP Studio Legal Agreement",
     description:
       "Understand the terms, intellectual property policies, and usage guidelines governing WebP Studio's in-browser image optimization tools.",
-    url: "https://webpstudio.online/terms",
+    url: "https://thewebpstudio.com/terms",
     siteName: "WebP Studio",
     locale: "en_US",
     type: "website",
@@ -81,40 +81,40 @@ export default function TermsPage() {
     "@graph": [
       {
         "@type": "WebPage",
-        "@id": "https://webpstudio.online/terms/#webpage",
+        "@id": "https://thewebpstudio.com/terms/#webpage",
         name: "Terms of Service – WebP Studio",
-        url: "https://webpstudio.online/terms",
+        url: "https://thewebpstudio.com/terms",
         description:
           "Terms of Service, acceptable use guidelines, and legal disclaimer for WebP Studio.",
         inLanguage: "en-US",
         isPartOf: {
           "@type": "WebSite",
-          "@id": "https://webpstudio.online/#website",
+          "@id": "https://thewebpstudio.com/#website",
           name: "WebP Studio",
-          url: "https://webpstudio.online",
+          url: "https://thewebpstudio.com",
         },
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://webpstudio.online/terms/#breadcrumbs",
+        "@id": "https://thewebpstudio.com/terms/#breadcrumbs",
         itemListElement: [
           {
             "@type": "ListItem",
             position: 1,
             name: "Home",
-            item: "https://webpstudio.online",
+            item: "https://thewebpstudio.com",
           },
           {
             "@type": "ListItem",
             position: 2,
             name: "Terms of Service",
-            item: "https://webpstudio.online/terms",
+            item: "https://thewebpstudio.com/terms",
           },
         ],
       },
       {
         "@type": "FAQPage",
-        "@id": "https://webpstudio.online/terms/#faq",
+        "@id": "https://thewebpstudio.com/terms/#faq",
         mainEntity: [
           {
             "@type": "Question",
@@ -223,7 +223,7 @@ export default function TermsPage() {
               By accessing, browsing, or using <strong>WebP Studio</strong>{" "}
               (accessible at{" "}
               <code className="text-indigo-600 font-mono bg-slate-100 px-1 py-0.5 rounded">
-                https://webpstudio.online
+                https://thewebpstudio.com
               </code>
               ), you confirm that you have read, understood, and agreed to be
               bound by these Terms of Service. If you do not agree to these
@@ -421,7 +421,7 @@ export default function TermsPage() {
               at:
             </p>
             <p className="text-xs font-mono text-indigo-600 bg-slate-50 border border-slate-200 p-2.5 rounded-lg inline-block">
-              legal@webpstudio.online
+              legal@thewebpstudio.com
             </p>
           </section>
 

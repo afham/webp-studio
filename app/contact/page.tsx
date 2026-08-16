@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://webpstudio.online"),
+  metadataBase: new URL("https://thewebpstudio.com"),
   title: "Contact WebP Studio – Support, Feedback & Technical Inquiries",
   description:
     "Get in touch with the WebP Studio engineering team for technical support, feature requests, bug reports, API questions, and privacy inquiries regarding our browser-native image converter.",
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   authors: [
     {
       name: "WebP Studio Support Team",
-      url: "https://webpstudio.online/contact",
+      url: "https://thewebpstudio.com/contact",
     },
   ],
   creator: "WebP Studio",
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     title: "Contact WebP Studio – Support & Technical Inquiries",
     description:
       "Have questions, feedback, or feature suggestions for WebP Studio? Reach out to our team.",
-    url: "https://webpstudio.online/contact",
+    url: "https://thewebpstudio.com/contact",
     siteName: "WebP Studio",
     locale: "en_US",
     type: "website",
@@ -82,31 +82,31 @@ export default function ContactPage() {
     "@graph": [
       {
         "@type": "ContactPage",
-        "@id": "https://webpstudio.online/contact/#contactpage",
+        "@id": "https://thewebpstudio.com/contact/#contactpage",
         name: "Contact WebP Studio",
-        url: "https://webpstudio.online/contact",
+        url: "https://thewebpstudio.com/contact",
         description:
           "Contact channels, support hours, and feedback forms for WebP Studio.",
         mainEntity: {
           "@type": "Organization",
           name: "WebP Studio",
-          url: "https://webpstudio.online",
+          url: "https://thewebpstudio.com",
           contactPoint: [
             {
               "@type": "ContactPoint",
-              email: "support@webpstudio.online",
+              email: "support@thewebpstudio.com",
               contactType: "customer support",
               availableLanguage: ["English"],
             },
             {
               "@type": "ContactPoint",
-              email: "privacy@webpstudio.online",
+              email: "privacy@thewebpstudio.com",
               contactType: "data protection officer",
               availableLanguage: ["English"],
             },
             {
               "@type": "ContactPoint",
-              email: "partners@webpstudio.online",
+              email: "partners@thewebpstudio.com",
               contactType: "partnerships",
               availableLanguage: ["English"],
             },
@@ -115,25 +115,25 @@ export default function ContactPage() {
       },
       {
         "@type": "BreadcrumbList",
-        "@id": "https://webpstudio.online/contact/#breadcrumbs",
+        "@id": "https://thewebpstudio.com/contact/#breadcrumbs",
         itemListElement: [
           {
             "@type": "ListItem",
             position: 1,
             name: "Home",
-            item: "https://webpstudio.online",
+            item: "https://thewebpstudio.com",
           },
           {
             "@type": "ListItem",
             position: 2,
             name: "Contact",
-            item: "https://webpstudio.online/contact",
+            item: "https://thewebpstudio.com/contact",
           },
         ],
       },
       {
         "@type": "FAQPage",
-        "@id": "https://webpstudio.online/contact/#faq",
+        "@id": "https://thewebpstudio.com/contact/#faq",
         mainEntity: [
           {
             "@type": "Question",
@@ -156,7 +156,7 @@ export default function ContactPage() {
             name: "How do I report a conversion bug or memory crash on a specific file?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Send an email to support@webpstudio.online with your browser version, operating system, and the error description. Since files are never uploaded to our servers, detailing the input image dimensions and file format helps us recreate the issue locally.",
+              text: "Send an email to support@thewebpstudio.com with your browser version, operating system, and the error description. Since files are never uploaded to our servers, detailing the input image dimensions and file format helps us recreate the issue locally.",
             },
           },
         ],
@@ -228,10 +228,10 @@ export default function ContactPage() {
                   memory limits?
                 </p>
                 <a
-                  href="mailto:support@webpstudio.online"
+                  href="mailto:support@thewebpstudio.com"
                   className="font-mono text-indigo-600 hover:underline font-semibold block pt-1 break-all"
                 >
-                  support@webpstudio.online
+                  support@thewebpstudio.com
                 </a>
               </div>
 
@@ -247,10 +247,10 @@ export default function ContactPage() {
                   sandbox?
                 </p>
                 <a
-                  href="mailto:privacy@webpstudio.online"
+                  href="mailto:privacy@thewebpstudio.com"
                   className="font-mono text-indigo-600 hover:underline font-semibold block pt-1 break-all"
                 >
-                  privacy@webpstudio.online
+                  privacy@thewebpstudio.com
                 </a>
               </div>
 
@@ -266,10 +266,10 @@ export default function ContactPage() {
                   press features.
                 </p>
                 <a
-                  href="mailto:partners@webpstudio.online"
+                  href="mailto:partners@thewebpstudio.com"
                   className="font-mono text-indigo-600 hover:underline font-semibold block pt-1 break-all"
                 >
-                  partners@webpstudio.online
+                  partners@thewebpstudio.com
                 </a>
               </div>
             </div>
@@ -286,7 +286,7 @@ export default function ContactPage() {
             </p>
 
             <form
-              action="mailto:support@webpstudio.online"
+              action="mailto:support@thewebpstudio.com"
               method="GET"
               className="space-y-4 text-xs"
             >
@@ -418,7 +418,7 @@ export default function ContactPage() {
                   Check your browser settings to verify that pop-ups or
                   automatic file downloads are permitted for{" "}
                   <code className="text-indigo-600 font-mono">
-                    webpstudio.online
+                    thewebpstudio.com
                   </code>
                   .
                 </p>

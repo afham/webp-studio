@@ -717,24 +717,32 @@ export default function WebpStudioWorkbench() {
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl max-w-md w-full space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center shrink-0">
                 <svg
-                  className="w-5 h-5 animate-spin"
+                  className="w-5 h-5 animate-spin text-indigo-600"
+                  viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
-                  viewBox="0 0 24 24"
                 >
+                  {/* Subtle Track */}
+                  <circle
+                    className="opacity-20"
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    strokeWidth="2.5"
+                  />
+                  {/* Spinning Arc */}
                   <path
+                    d="M12 3a9 9 0 0 1 9 9"
+                    strokeWidth="2.5"
                     strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2.5}
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
               </div>
               <div className="overflow-hidden flex-1">
                 <h4 className="text-sm font-bold text-slate-900">
-                  WebP Engine Active
+                  Processing using WebP Engine
                 </h4>
                 <p className="text-xs text-slate-500 truncate mt-0.5">
                   {processingStatus}
@@ -1394,8 +1402,21 @@ export default function WebpStudioWorkbench() {
                   <a
                     href={selectedFile.convertedUrl}
                     download={selectedFile.webpName}
-                    className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
+                    className="px-4 py-1.5 flex gap-1 items-center bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
                   >
+                    <svg
+                      className="w-3.5 h-3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                      />
+                    </svg>
                     Download WebP
                   </a>
                 </div>
