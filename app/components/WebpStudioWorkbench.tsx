@@ -817,7 +817,7 @@ export default function WebpStudioWorkbench() {
             <>
               <button
                 onClick={clearFiles}
-                className="text-xs font-semibold text-slate-500 hover:text-slate-800 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+                className="text-xs font-semibold text-red-500 hover:text-red-600 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-100 transition cursor-pointer"
               >
                 Clear
               </button>
@@ -1233,23 +1233,23 @@ export default function WebpStudioWorkbench() {
                       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden [transform:translateZ(0)] transition-transform duration-150"
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
-                      {/* Left Badge: Original */}
-                      <div className="absolute top-3 left-3 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-950/85 backdrop-blur-md border border-white/20 shadow-md ring-1 ring-black/40">
+                      {/* Left Badge: Original (Frosted White Glass) */}
+                      <div className="absolute top-2 left-2 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50/50 backdrop-blur-md border border-white/60 shadow-xs ring-1 ring-slate-900/5">
                         <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
-                        <span className="text-[10px] font-mono font-bold text-white tracking-wide">
+                        <span className="text-[10px] font-mono font-extrabold text-slate-800 tracking-wide">
                           ORIGINAL{" "}
-                          <span className="text-slate-300 font-normal">
+                          <span className="text-slate-500 font-extrabold">
                             ({formatSize(selectedFile.originalSize)})
                           </span>
                         </span>
                       </div>
 
-                      {/* Right Badge: WebP */}
-                      <div className="absolute top-3 right-3 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-950/85 backdrop-blur-md border border-white/20 shadow-md ring-1 ring-black/40">
-                        <span className="w-2 h-2 rounded-full bg-indigo-400 shrink-0 shadow-[0_0_8px_rgba(129,140,248,0.9)]" />
-                        <span className="text-[10px] font-mono font-bold text-white tracking-wide">
+                      {/* Right Badge: WebP (Frosted Indigo-Tinted Glass) */}
+                      <div className="absolute top-2 right-2 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50/50 backdrop-blur-md border border-indigo-200/70 shadow-xs ring-1 ring-indigo-500/10">
+                        <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 shadow-[0_0_6px_rgba(79,70,229,0.5)]" />
+                        <span className="text-[10px] font-mono font-extrabold text-indigo-950 tracking-wide">
                           WEBP{" "}
-                          <span className="text-slate-300 font-normal">
+                          <span className="text-indigo-600 font-extrabold">
                             ({formatSize(selectedFile.convertedSize)})
                           </span>
                         </span>
@@ -1284,7 +1284,7 @@ export default function WebpStudioWorkbench() {
                         style={{ left: `${sliderPos}%` }}
                       >
                         <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-md text-xs font-bold border border-white">
-                          ↔
+                          <span className="-translate-y-1 scale-150">↔</span>
                         </div>
                       </div>
                     </div>
