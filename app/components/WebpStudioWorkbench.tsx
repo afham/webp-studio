@@ -1572,7 +1572,7 @@ export default function WebpStudioWorkbench() {
                         )
                       }
                       className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-700 bg-indigo-50 border border-indigo-100 hover:border-indigo-200 px-2 py-0.5 rounded-md transition cursor-pointer"
-                      title="Sync settings"
+                      title="Apply settings to all files"
                     >
                       {selectedIds.size > 0
                         ? `Apply to (${selectedIds.size})`
