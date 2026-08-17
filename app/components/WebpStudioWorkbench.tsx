@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import JSZip from "jszip";
 import NextImage from "next/image";
+import Link from "next/link";
 
 export type Preset = "balanced" | "ultra" | "lossless" | "custom";
 export type ResizeMode = "contain" | "cover" | "none";
@@ -769,9 +770,14 @@ export default function WebpStudioWorkbench() {
       )}
 
       {/* Top Application Header */}
-      <header className="h-16 lg:h-14 border-b border-slate-200 bg-white/90 backdrop-blur-xl px-4 lg:px-5 flex items-center justify-between shrink-0 z-30 shadow-xs gap-3">
+      {/* Top Application Header */}
+      <header className="min-h-14 border-b border-slate-200 bg-white/90 backdrop-blur-xl px-3.5 sm:px-5 lg:px-6 py-2.5 lg:py-0 flex flex-wrap items-center justify-between shrink-0 z-30 shadow-xs gap-y-2.5 gap-x-6">
+        {/* Left: Logo & Title with 2-line mobile subheader */}
         <div className="flex items-center gap-3 shrink-0 min-w-0">
-          <div className="relative w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center">
+          <Link
+            href="/"
+            className="relative w-8 h-8 rounded-lg overflow-hidden shrink-0 flex items-center justify-center"
+          >
             <NextImage
               src="/logo.svg"
               alt="WebP Studio Logo"
@@ -780,66 +786,26 @@ export default function WebpStudioWorkbench() {
               priority
               className="w-full h-full object-contain"
             />
-          </div>
-          <div
-            className={`${files.length > 0 ? "hidden sm:block" : "block"} min-w-0`}
-          >
-            <h1 className="font-bold text-sm text-slate-900 leading-none truncate">
-              WebP Studio — Free Online WebP Converter
+          </Link>
+          <div className="min-w-0">
+            <h1 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight truncate">
+              WebP Studio
             </h1>
-            <p className="text-[10px] text-slate-500 font-mono mt-1 leading-none truncate">
-              In-Browser WebP Conversion • 100% Private • Zero Uploads
-            </p>
+            {/* Mobile: 2-line stacked micro font | Desktop: 1-line clean font */}
+            <div className="text-[9px] sm:text-[10px] text-slate-500 font-mono mt-0.5 leading-[1.15] sm:leading-tight">
+              <span className="block sm:inline">
+                In-Browser WebP Conversion
+              </span>
+              <span className="hidden sm:inline"> • </span>
+              <span className="block sm:inline text-slate-400 sm:text-slate-500">
+                100% Private • Zero Uploads
+              </span>
+            </div>
           </div>
         </div>
 
-        {/* Global Batch Size Summary */}
-        {files.length > 0 && (
-          <div className="flex items-center gap-2 sm:gap-3 bg-slate-100/90 border border-slate-200/90 px-3 py-1 rounded-xl shrink-0">
-            <div className="flex items-center gap-2 text-xs">
-              <div className="flex flex-col">
-                <span className="text-[8px] uppercase font-mono font-bold text-slate-500">
-                  Original
-                </span>
-                <span className="font-mono text-slate-700 text-xs font-semibold">
-                  {formatSize(totalOriginalSize)}
-                </span>
-              </div>
-              <span className="text-slate-400 font-bold text-xs">→</span>
-              <div className="flex flex-col">
-                <span className="text-[8px] uppercase font-mono font-bold text-indigo-600">
-                  WebP
-                </span>
-                <span className="font-mono text-indigo-700 text-xs font-bold">
-                  {formatSize(totalConvertedSize)}
-                </span>
-              </div>
-              <div className="hidden md:block h-6 w-px bg-slate-300 mx-1" />
-              <div className="hidden md:flex flex-col">
-                <span className="text-[8px] uppercase font-mono font-bold text-slate-500">
-                  Saved
-                </span>
-                <span className="font-mono text-emerald-700 text-xs font-semibold">
-                  {formatSize(totalSavedBytes)}
-                </span>
-              </div>
-            </div>
-
-            <span
-              className={`text-xs font-mono font-bold px-2 py-0.5 rounded-md border ${
-                totalSavingsPct >= 0
-                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-                  : "bg-rose-50 text-rose-700 border-rose-200"
-              }`}
-            >
-              {totalSavingsPct >= 0
-                ? `-${totalSavingsPct.toFixed(1)}%`
-                : `+${Math.abs(totalSavingsPct).toFixed(1)}%`}
-            </span>
-          </div>
-        )}
-
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Right Action Buttons */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto lg:order-3">
           {files.length > 0 && (
             <>
               <button
@@ -850,7 +816,7 @@ export default function WebpStudioWorkbench() {
               </button>
               <button
                 onClick={downloadAllAsZip}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition shadow-xs active:scale-95 cursor-pointer whitespace-nowrap"
               >
                 <svg
                   className="w-3.5 h-3.5"
@@ -868,13 +834,59 @@ export default function WebpStudioWorkbench() {
                 <span>
                   Zip{" "}
                   {selectedIds.size > 0
-                    ? `Selected (${selectedIds.size})`
-                    : `All (${files.length})`}
+                    ? `(${selectedIds.size})`
+                    : `(${files.length})`}
                 </span>
               </button>
             </>
           )}
         </div>
+
+        {/* Center / Bottom on Mobile: Global Batch Size Summary with extra breathing room */}
+        {files.length > 0 && (
+          <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3.5 bg-slate-100/90 border border-slate-200/90 px-3 py-1.5 rounded-xl shrink-0 order-3 lg:order-2 lg:mx-auto">
+            <div className="flex items-center gap-2 sm:gap-2.5 text-xs">
+              <div className="flex flex-col">
+                <span className="text-[8px] uppercase font-mono font-bold text-slate-500 leading-none">
+                  Original
+                </span>
+                <span className="font-mono text-slate-700 text-[11px] sm:text-xs font-semibold mt-0.5">
+                  {formatSize(totalOriginalSize)}
+                </span>
+              </div>
+              <span className="text-slate-400 font-bold text-xs">→</span>
+              <div className="flex flex-col">
+                <span className="text-[8px] uppercase font-mono font-bold text-indigo-600 leading-none">
+                  WebP
+                </span>
+                <span className="font-mono text-indigo-700 text-[11px] sm:text-xs font-bold mt-0.5">
+                  {formatSize(totalConvertedSize)}
+                </span>
+              </div>
+              <div className="hidden md:block h-6 w-px bg-slate-300 mx-1" />
+              <div className="hidden md:flex flex-col">
+                <span className="text-[8px] uppercase font-mono font-bold text-slate-500 leading-none">
+                  Saved
+                </span>
+                <span className="font-mono text-emerald-700 text-xs font-semibold mt-0.5">
+                  {formatSize(totalSavedBytes)}
+                </span>
+              </div>
+            </div>
+
+            <span
+              className={`text-[10px] sm:text-xs font-mono font-bold px-2 py-0.5 rounded-md border ml-1 ${
+                totalSavingsPct >= 0
+                  ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+                  : "bg-rose-50 text-rose-700 border-rose-200"
+              }`}
+            >
+              {totalSavingsPct >= 0
+                ? `-${totalSavingsPct.toFixed(1)}%`
+                : `+${Math.abs(totalSavingsPct).toFixed(1)}%`}
+            </span>
+          </div>
+        )}
       </header>
 
       {/* Main Grid Layout */}

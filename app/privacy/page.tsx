@@ -538,7 +538,7 @@ export default function PrivacyPage() {
               to our privacy office at:
             </p>
             <p className="text-xs font-mono text-indigo-600 bg-slate-50 border border-slate-200 p-2.5 rounded-lg inline-block">
-              privacy@thewebpstudio.com
+              afhammk8@gmail.com
             </p>
           </section>
 

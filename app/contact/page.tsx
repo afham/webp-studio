@@ -5,24 +5,19 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://thewebpstudio.com"),
   title: "Contact WebP Studio – Support, Feedback & Technical Inquiries",
   description:
-    "Get in touch with the WebP Studio engineering team for technical support, feature requests, bug reports, API questions, and privacy inquiries regarding our browser-native image converter.",
+    "Get in touch with the WebP Studio team for technical support, feature requests, bug reports, API questions, and privacy inquiries regarding our browser-native image converter.",
   keywords: [
-    // Core Contact & Support Keywords
     "contact webp studio",
     "webp studio support",
     "webp converter feedback",
     "report webp bug",
     "image compressor technical support",
     "webp studio help desk",
-
-    // Developer & Integration Queries
     "client side webp converter api",
     "browser native image processing support",
     "feature request webp converter",
     "image conversion troubleshooting",
     "canvas toblob support",
-
-    // Privacy & Security Inquiries
     "webp studio privacy contact",
     "zero upload verification inquiry",
     "open source web tool support",
@@ -42,7 +37,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Contact WebP Studio – Support & Technical Inquiries",
     description:
-      "Have questions, feedback, or feature suggestions for WebP Studio? Reach out to our team.",
+      "Have questions, feedback, or feature suggestions for WebP Studio? Reach out directly to our team.",
     url: "https://thewebpstudio.com/contact",
     siteName: "WebP Studio",
     locale: "en_US",
@@ -60,7 +55,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Contact WebP Studio – Help & Inquiries",
     description:
-      "Reach out to the WebP Studio development team for questions, suggestions, or bug reports.",
+      "Reach out to the WebP Studio team for questions, suggestions, or bug reports.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -86,7 +81,7 @@ export default function ContactPage() {
         name: "Contact WebP Studio",
         url: "https://thewebpstudio.com/contact",
         description:
-          "Contact channels, support hours, and feedback forms for WebP Studio.",
+          "Official contact channels, technical support, bug report intake, and feedback for WebP Studio.",
         mainEntity: {
           "@type": "Organization",
           name: "WebP Studio",
@@ -94,20 +89,8 @@ export default function ContactPage() {
           contactPoint: [
             {
               "@type": "ContactPoint",
-              email: "support@thewebpstudio.com",
+              email: "afhammk8@gmail.com",
               contactType: "customer support",
-              availableLanguage: ["English"],
-            },
-            {
-              "@type": "ContactPoint",
-              email: "privacy@thewebpstudio.com",
-              contactType: "data protection officer",
-              availableLanguage: ["English"],
-            },
-            {
-              "@type": "ContactPoint",
-              email: "partners@thewebpstudio.com",
-              contactType: "partnerships",
               availableLanguage: ["English"],
             },
           ],
@@ -137,10 +120,10 @@ export default function ContactPage() {
         mainEntity: [
           {
             "@type": "Question",
-            name: "How fast does the WebP Studio support team respond?",
+            name: "How fast does the WebP Studio team respond?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Our engineering and support team typically reviews all technical inquiries, bug reports, and partnership emails within 24 to 48 business hours.",
+              text: "All technical inquiries, bug reports, and feedback emails sent to afhammk8@gmail.com are typically reviewed within 24 to 48 hours.",
             },
           },
           {
@@ -148,7 +131,7 @@ export default function ContactPage() {
             name: "Can I suggest new image formats or feature enhancements?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Yes. We actively welcome feedback and feature requests for new codecs (such as SVG vector scaling or animated WebP encoding) via our support email or GitHub issue tracker.",
+              text: "Yes. We actively welcome feedback and feature requests for new codecs (such as SVG vector scaling or animated WebP encoding) via email.",
             },
           },
           {
@@ -156,7 +139,7 @@ export default function ContactPage() {
             name: "How do I report a conversion bug or memory crash on a specific file?",
             acceptedAnswer: {
               "@type": "Answer",
-              text: "Send an email to support@thewebpstudio.com with your browser version, operating system, and the error description. Since files are never uploaded to our servers, detailing the input image dimensions and file format helps us recreate the issue locally.",
+              text: "Send an email to afhammk8@gmail.com with your browser version, operating system, and the error description. Since files are never uploaded to our servers, detailing the input image dimensions and file format helps us recreate the issue locally.",
             },
           },
         ],
@@ -205,184 +188,100 @@ export default function ContactPage() {
             </h1>
             <p className="text-sm sm:text-base text-slate-600 leading-relaxed">
               Have questions regarding our client-side image processing engine,
-              bug reports, feature suggestions, or enterprise inquiries? We are
+              bug reports, feature suggestions, or general inquiries? We are
               here to help.
             </p>
           </header>
 
-          {/* Department Directory Grid */}
+          {/* Direct Contact Card & Quick Template Triggers */}
           <section className="space-y-4">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              1. Departmental Support Channels
+              1. Direct Email Support
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                  🛠️
+
+            <div className="p-6 rounded-2xl bg-slate-50 border border-slate-200 space-y-5">
+              <div className="space-y-2">
+                <div className="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-base">
+                  ✉️
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">
-                  Technical Support &amp; Bugs
+                <h3 className="font-bold text-base text-slate-900">
+                  Reach Out Directly
                 </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Experiencing conversion issues, canvas rendering errors, or
-                  memory limits?
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Send your technical inquiries, bug reports, feature
+                  suggestions, or privacy questions to our direct inbox:
                 </p>
-                <a
-                  href="mailto:support@thewebpstudio.com"
-                  className="font-mono text-indigo-600 hover:underline font-semibold block pt-1 break-all"
-                >
-                  support@thewebpstudio.com
-                </a>
+                <div className="pt-1">
+                  <a
+                    href="mailto:afhammk8@gmail.com"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 hover:border-indigo-300 rounded-xl text-indigo-600 font-mono font-bold text-sm hover:bg-indigo-50/50 transition shadow-2xs"
+                  >
+                    <span>afhammk8@gmail.com</span>
+                    <span className="text-xs text-slate-400 font-sans">↗</span>
+                  </a>
+                </div>
               </div>
 
-              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                  🔒
+              {/* Pre-formatted Subject Templates */}
+              <div className="pt-4 border-t border-slate-200/80 space-y-2.5">
+                <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider block">
+                  Quick Subject Templates (Click to compose):
+                </span>
+                <div className="flex flex-wrap gap-2 text-xs">
+                  <a
+                    href="mailto:afhammk8@gmail.com?subject=WebP%20Studio%20-%20Bug%20Report"
+                    className="px-3 py-1.5 bg-white border border-slate-200 hover:border-indigo-300 text-slate-700 hover:text-indigo-600 font-medium rounded-lg transition"
+                  >
+                    🐛 Report a Bug
+                  </a>
+                  <a
+                    href="mailto:afhammk8@gmail.com?subject=WebP%20Studio%20-%20Feature%20Request"
+                    className="px-3 py-1.5 bg-white border border-slate-200 hover:border-indigo-300 text-slate-700 hover:text-indigo-600 font-medium rounded-lg transition"
+                  >
+                    💡 Suggest a Feature
+                  </a>
+                  <a
+                    href="mailto:afhammk8@gmail.com?subject=WebP%20Studio%20-%20Privacy%20Inquiry"
+                    className="px-3 py-1.5 bg-white border border-slate-200 hover:border-indigo-300 text-slate-700 hover:text-indigo-600 font-medium rounded-lg transition"
+                  >
+                    🔒 Privacy Inquiry
+                  </a>
+                  <a
+                    href="mailto:afhammk8@gmail.com?subject=WebP%20Studio%20-%20General%20Inquiry"
+                    className="px-3 py-1.5 bg-white border border-slate-200 hover:border-indigo-300 text-slate-700 hover:text-indigo-600 font-medium rounded-lg transition"
+                  >
+                    💬 General Inquiry
+                  </a>
                 </div>
-                <h3 className="font-bold text-sm text-slate-900">
-                  Privacy &amp; Data Security
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Questions about our zero-upload architecture or client-side
-                  sandbox?
-                </p>
-                <a
-                  href="mailto:privacy@thewebpstudio.com"
-                  className="font-mono text-indigo-600 hover:underline font-semibold block pt-1 break-all"
-                >
-                  privacy@thewebpstudio.com
-                </a>
-              </div>
-
-              <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center font-bold text-sm">
-                  🤝
-                </div>
-                <h3 className="font-bold text-sm text-slate-900">
-                  Partnerships &amp; Media
-                </h3>
-                <p className="text-slate-600 leading-relaxed">
-                  Propose integration ideas, open-source collaborations, or
-                  press features.
-                </p>
-                <a
-                  href="mailto:partners@thewebpstudio.com"
-                  className="font-mono text-indigo-600 hover:underline font-semibold block pt-1 break-all"
-                >
-                  partners@thewebpstudio.com
-                </a>
               </div>
             </div>
           </section>
 
-          {/* Quick Inquiry Form */}
-          <section className="space-y-4">
-            <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              2. Submit a Message or Feature Suggestion
-            </h2>
-            <p className="text-xs text-slate-600">
-              Fill out the form below and our team will get back to you within
-              24 to 48 hours.
-            </p>
-
-            <form
-              action="mailto:support@thewebpstudio.com"
-              method="GET"
-              className="space-y-4 text-xs"
-            >
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label
-                    htmlFor="name"
-                    className="font-bold text-slate-700 block"
-                  >
-                    Your Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    placeholder="Jane Doe"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-indigo-500 font-sans"
-                  />
-                </div>
-
-                <div className="space-y-1">
-                  <label
-                    htmlFor="email"
-                    className="font-bold text-slate-700 block"
-                  >
-                    Your Email Address
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    placeholder="jane@example.com"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-indigo-500 font-sans"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-1">
-                <label
-                  htmlFor="subject"
-                  className="font-bold text-slate-700 block"
-                >
-                  Inquiry Category
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-indigo-500 font-sans"
-                >
-                  <option value="Bug Report">
-                    Bug Report / Processing Error
-                  </option>
-                  <option value="Feature Request">
-                    Feature Request / New Format Idea
-                  </option>
-                  <option value="Performance Feedback">
-                    Performance Feedback &amp; Suggestions
-                  </option>
-                  <option value="General Inquiry">
-                    General Technical Question
-                  </option>
-                </select>
-              </div>
-
-              <div className="space-y-1">
-                <label
-                  htmlFor="body"
-                  className="font-bold text-slate-700 block"
-                >
-                  Detailed Message
-                </label>
-                <textarea
-                  id="body"
-                  name="body"
-                  rows={4}
-                  required
-                  placeholder="Describe your issue or suggestion in detail..."
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-slate-800 focus:outline-none focus:border-indigo-500 font-sans resize-none"
-                ></textarea>
-              </div>
-
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition shadow-xs cursor-pointer"
-              >
-                Send Message
-              </button>
-            </form>
+          {/* Guidelines on What to Include */}
+          <section className="p-6 rounded-xl bg-indigo-50/60 border border-indigo-100 space-y-2 text-xs text-slate-700">
+            <h3 className="font-bold text-sm text-indigo-950">
+              💡 What to include in your message for faster resolution:
+            </h3>
+            <ul className="list-disc pl-4 space-y-1 text-slate-600">
+              <li>
+                Your operating system (macOS, Windows, Linux, iOS, Android) and
+                browser version.
+              </li>
+              <li>
+                Input file format (PNG, JPG, HEIC, TIFF, etc.) and approximate
+                dimensions.
+              </li>
+              <li>
+                Whether any ad blockers or privacy extensions are enabled in
+                your browser.
+              </li>
+            </ul>
           </section>
 
           {/* Common Troubleshooting & Help Matrix */}
           <section className="space-y-4">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              3. Self-Service Troubleshooting &amp; Resolution Guide
+              2. Self-Service Troubleshooting &amp; Resolution Guide
             </h2>
             <div className="space-y-3 text-xs">
               <div className="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1">
@@ -429,35 +328,59 @@ export default function ContactPage() {
           {/* FAQ Accordion Section */}
           <section className="space-y-4">
             <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-              Frequently Asked Questions Regarding Support
+              3. Support FAQ
             </h2>
             <div className="space-y-3">
-              <details className="p-4 border border-slate-200 rounded-xl bg-slate-50 group">
+              <details
+                className="p-4 border border-slate-200 rounded-xl bg-slate-50 group"
+                open
+              >
                 <summary className="font-semibold text-xs cursor-pointer list-none flex justify-between items-center text-slate-900">
-                  What information should I include in a bug report?
+                  How fast does the WebP Studio team respond?
                   <span className="text-slate-400 group-open:rotate-180 transition">
                     ▾
                   </span>
                 </summary>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                  Please mention your operating system (macOS, Windows, Linux,
-                  iOS, Android), your browser name and version, approximate
-                  input image dimensions (e.g., 4000×3000px), and whether any
-                  browser extensions (like ad blockers) are active.
+                  All technical inquiries, bug reports, and feedback sent to{" "}
+                  <code className="font-mono text-indigo-600">
+                    afhammk8@gmail.com
+                  </code>{" "}
+                  are typically reviewed within 24 to 48 hours.
                 </p>
               </details>
 
               <details className="p-4 border border-slate-200 rounded-xl bg-slate-50 group">
                 <summary className="font-semibold text-xs cursor-pointer list-none flex justify-between items-center text-slate-900">
-                  Can I contribute or suggest code improvements?
+                  Can I suggest new image formats or feature enhancements?
                   <span className="text-slate-400 group-open:rotate-180 transition">
                     ▾
                   </span>
                 </summary>
                 <p className="text-xs text-slate-600 mt-2 leading-relaxed">
-                  Yes! We love community feedback. If you have performance
-                  benchmarks, WebAssembly integration ideas, or UI suggestions,
-                  reach out via our support email.
+                  Yes! We actively welcome feedback and feature requests for new
+                  codecs (such as SVG vector scaling or animated WebP encoding)
+                  via email.
+                </p>
+              </details>
+
+              <details className="p-4 border border-slate-200 rounded-xl bg-slate-50 group">
+                <summary className="font-semibold text-xs cursor-pointer list-none flex justify-between items-center text-slate-900">
+                  How do I report a conversion bug or memory crash on a specific
+                  file?
+                  <span className="text-slate-400 group-open:rotate-180 transition">
+                    ▾
+                  </span>
+                </summary>
+                <p className="text-xs text-slate-600 mt-2 leading-relaxed">
+                  Send an email to{" "}
+                  <code className="font-mono text-indigo-600">
+                    afhammk8@gmail.com
+                  </code>{" "}
+                  with your browser version, operating system, and the error
+                  description. Since files are never uploaded to our servers,
+                  detailing the input image dimensions and file format helps us
+                  recreate the issue locally.
                 </p>
               </details>
             </div>
