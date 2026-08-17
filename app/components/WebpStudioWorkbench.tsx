@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import JSZip from "jszip";
 import NextImage from "next/image";
 import Link from "next/link";
+import { trackEvent } from "../lib/gtag";
 
 export type Preset = "balanced" | "ultra" | "lossless" | "custom";
 export type ResizeMode = "contain" | "cover" | "none";
@@ -583,6 +584,12 @@ export default function WebpStudioWorkbench() {
     link.download = `webp_batch_${downloadQueue.length}_assets.zip`;
     link.click();
     URL.revokeObjectURL(zipUrl);
+
+    // Trigger custom Google Analytics event for batch download
+    trackEvent("download_zip", {
+      file_count: downloadQueue.length,
+      total_savings_bytes: totalSavedBytes,
+    });
   };
 
   const formatSize = (bytes: number) => {
