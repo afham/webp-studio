@@ -1,31 +1,53 @@
+// app/sitemap.ts
 import { MetadataRoute } from "next";
+import { ALL_CONVERTER_SLUGS } from "./lib/converter"; // From the file we made earlier
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://thewebpstudio.com";
-  const currentDate = new Date();
 
-  // All high-intent routes
-  const routes = [
-    "",
-    "/png-to-webp",
-    "/jpg-to-webp",
-    "/avif-to-webp",
-    "/heic-to-webp",
-    "/tiff-to-webp",
-    "/bmp-to-webp",
-    "/gif-to-webp",
-    "/compress-webp",
-    "/batch-webp-converter",
-    "/about",
-    "/privacy",
-    "/terms",
-    "/contact",
+  // Base Routes
+  const routes: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/about`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${baseUrl}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/terms`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
+    {
+      url: `${baseUrl}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.4,
+    },
   ];
 
-  return routes.map((route) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: currentDate,
-    changeFrequency: route === "" ? "daily" : "weekly",
-    priority: route === "" ? 1.0 : route.includes("-to-webp") ? 0.9 : 0.5,
-  }));
+  // Dynamic SEO Format Routes
+  const dynamicRoutes: MetadataRoute.Sitemap = ALL_CONVERTER_SLUGS.map(
+    (slug) => ({
+      url: `${baseUrl}/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9, // High priority for your tool pages
+    }),
+  );
+
+  return [...routes, ...dynamicRoutes];
 }
