@@ -17,13 +17,16 @@ export default function KofiFloatingButton({
     <>
       <style>{`
         /* 1. Position the main wrapper to the bottom-right */
-        .floatingchat-container-wrap,
-        .floatingchat-container-wrap-mobi {
+        .floatingchat-container-wrap {
           left: auto !important;
           right: 16px !important;
           margin: 0 !important;
         }
-
+        .floatingchat-container-wrap-mobi {
+          left: auto !important;
+          right: 180px !important;
+          margin: 0 !important;
+        }
         /* 2. Keep the popup container aligned inside the wrapper */
         .floating-chat-kofi-popup-iframe-container,
         .floating-chat-kofi-popup-iframe-container-mobi {
