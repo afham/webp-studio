@@ -5,6 +5,7 @@ import JSZip from "jszip";
 import NextImage from "next/image";
 import Link from "next/link";
 import { trackEvent } from "../lib/gtag";
+import KofiFloatingButton from "./KofiFloatingButton";
 
 export type Preset = "balanced" | "ultra" | "lossless" | "custom";
 export type ResizeMode = "contain" | "cover" | "none";

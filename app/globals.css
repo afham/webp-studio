@@ -1,1 +1,5 @@
 @import "tailwindcss";
+
+.floatingchat-container-wrap {
+  right: 16px !important;
+}

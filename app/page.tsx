@@ -298,8 +298,25 @@ export default function Page() {
       </main>
 
       {/* Exhaustive Crawlable SEO & Keyword Architecture (Below the fold) */}
-      <footer className="w-full bg-white border-t border-slate-200 text-slate-700 py-16 px-4 sm:px-8 font-sans">
-        <div className="max-w-5xl mx-auto space-y-16">
+      <footer className="w-full bg-white border-t border-slate-200 text-slate-700 pb-16 pt-8 px-4 sm:px-8 font-sans">
+        <div className="max-w-5xl mx-auto space-y-16 ">
+          {/* Top Product Hunt Hero Badge */}
+          <div className="flex justify-center mb-6">
+            <a
+              href="https://www.producthunt.com/products/webp-studio?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-webp-studio"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block transition-transform hover:scale-105"
+            >
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1225131&theme=light&t=1787029036706"
+                alt="WebP Studio - 100% private, client-side batch WebP converter & compressor | Product Hunt"
+                width={250}
+                height={54}
+                className="w-[210px] sm:w-[250px] h-auto drop-shadow-xs"
+              />
+            </a>
+          </div>
           {/* Main Title & Hero SEO Text */}
           <section className="space-y-4">
             <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight sm:text-4xl">
