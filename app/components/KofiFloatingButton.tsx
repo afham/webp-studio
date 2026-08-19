@@ -14,19 +14,28 @@ export default function KofiFloatingButton({
   color = "#fcbf47",
 }: KofiFloatingButtonProps) {
   return (
-    <Script
-      src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"
-      strategy="afterInteractive"
-      onLoad={() => {
-        if (window.kofiWidgetOverlay) {
-          window.kofiWidgetOverlay.draw(username, {
-            type: "floating-chat",
-            "floating-chat.donateButton.text": label,
-            "floating-chat.donateButton.background-color": color,
-            "floating-chat.donateButton.text-color": "#323842",
-          });
+    <>
+      <style>{`
+        .floatingchat-container-wrap,
+        .floatingchat-container-wrap-mobi {
+          left: unset !important;
+          right: 16px !important;
         }
-      }}
-    />
+      `}</style>
+      <Script
+        src="https://storage.ko-fi.com/cdn/scripts/overlay-widget.js"
+        strategy="afterInteractive"
+        onLoad={() => {
+          if (window.kofiWidgetOverlay) {
+            window.kofiWidgetOverlay.draw(username, {
+              type: "floating-chat",
+              "floating-chat.donateButton.text": label,
+              "floating-chat.donateButton.background-color": color,
+              "floating-chat.donateButton.text-color": "#323842",
+            });
+          }
+        }}
+      />
+    </>
   );
 }
