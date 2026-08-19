@@ -456,7 +456,6 @@ export default function WebpStudioWorkbench() {
     });
   };
 
-  // High-performance filter slider handler with debounce + instant commit
   const handleFilterChange = (
     key: "brightness" | "contrast",
     value: number,
@@ -468,7 +467,6 @@ export default function WebpStudioWorkbench() {
 
     const updatedSettings = { ...selectedFile.settings, [key]: value };
 
-    // Update state synchronously for 60 FPS slider movement
     setFiles((prev) =>
       prev.map((item) =>
         item.id === selectedFile.id
@@ -477,7 +475,6 @@ export default function WebpStudioWorkbench() {
       ),
     );
 
-    // Debounce background canvas re-encode during dragging
     if (filterDebounceTimerRef.current) {
       clearTimeout(filterDebounceTimerRef.current);
     }
@@ -1231,7 +1228,7 @@ export default function WebpStudioWorkbench() {
                         </div>
 
                         <div className="flex items-center gap-1.5 mt-0.5 text-[10px] font-mono">
-                          <span className="text-slate-500">
+                          <span className="text-slate-500 font-medium">
                             {formatSize(file.originalSize)}
                           </span>
                           <span className="text-slate-400">→</span>
@@ -1288,7 +1285,7 @@ export default function WebpStudioWorkbench() {
                     <span className="text-xs font-bold text-slate-900 truncate max-w-[180px] sm:max-w-[240px]">
                       {selectedFile.webpName}
                     </span>
-                    <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0">
+                    <span className="text-[10px] font-mono text-slate-600 bg-slate-100 px-2 py-0.5 rounded border border-slate-200 shrink-0 font-medium">
                       {selectedFile.convertedWidth}×
                       {selectedFile.convertedHeight}px
                     </span>
@@ -1353,23 +1350,23 @@ export default function WebpStudioWorkbench() {
                       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden [transform:translateZ(0)] transition-transform duration-150"
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
-                      {/* Left Badge: Original (Electric Violet) */}
-                      <div className="absolute top-3 left-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-violet-950/90 text-violet-100 backdrop-blur-md shadow-xl border border-violet-500/40">
-                        <span className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
-                        <span className="text-[11px] font-mono font-bold tracking-wide">
+                      {/* Left Badge: Original */}
+                      <div className="absolute  top-3 left-0 sm:left-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 backdrop-blur-md shadow-md border border-slate-200/90">
+                        <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
+                        <span className="text-[11px] font-mono font-medium text-slate-600 tracking-wide">
                           Original {selectedFile.format}:{" "}
-                          <span className="text-violet-300 font-medium">
+                          <span className="font-bold text-slate-800">
                             ({formatSize(selectedFile.originalSize)})
                           </span>
                         </span>
                       </div>
 
-                      {/* Right Badge: WebP (Cyber Emerald) */}
-                      <div className="absolute top-3 right-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/90 text-emerald-100 backdrop-blur-md shadow-xl border border-emerald-500/40">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                        <span className="text-[11px] font-mono font-bold tracking-wide">
+                      {/* Right Badge: WebP */}
+                      <div className="absolute top-3 right-0 sm:right-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 backdrop-blur-md shadow-md border border-slate-200/90">
+                        <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 shadow-[0_0_6px_rgba(79,70,229,0.4)]" />
+                        <span className="text-[11px] font-mono font-medium text-indigo-600 tracking-wide">
                           WEBP{" "}
-                          <span className="text-emerald-300 font-semibold">
+                          <span className="font-bold text-indigo-700">
                             ({formatSize(selectedFile.convertedSize)})
                           </span>
                         </span>
@@ -1427,13 +1424,13 @@ export default function WebpStudioWorkbench() {
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
                       {/* Left Box: Original */}
-                      <div className="relative flex flex-col items-center justify-center bg-white rounded-xl p-2 border border-slate-200 h-full overflow-hidden">
-                        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-violet-950/90 text-violet-100 backdrop-blur-md shadow-xl border border-violet-500/40">
-                          <span className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
-                          <span className="text-[11px] font-mono font-bold tracking-wide">
+                      <div className="relative flex flex-col items-center justify-center bg-white rounded-xl p-2 border border-slate-200 h-full overflow-hidden shadow-2xs">
+                        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 backdrop-blur-md shadow-md border border-slate-200/90">
+                          <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
+                          <span className="text-[11px] font-mono font-medium text-slate-600 tracking-wide">
                             Original {selectedFile.format}:{" "}
-                            <span className="text-violet-300 font-medium">
-                              {formatSize(selectedFile.originalSize)}
+                            <span className="font-bold text-slate-800">
+                              ({formatSize(selectedFile.originalSize)})
                             </span>
                           </span>
                         </div>
@@ -1446,13 +1443,13 @@ export default function WebpStudioWorkbench() {
                       </div>
 
                       {/* Right Box: WebP */}
-                      <div className="relative flex flex-col items-center justify-center bg-white rounded-xl p-2 border border-slate-200 h-full overflow-hidden">
-                        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/90 text-emerald-100 backdrop-blur-md shadow-xl border border-emerald-500/40">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
-                          <span className="text-[11px] font-mono font-bold tracking-wide">
+                      <div className="relative flex flex-col items-center justify-center bg-white rounded-xl p-2 border border-slate-200 h-full overflow-hidden shadow-2xs">
+                        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 backdrop-blur-md shadow-md border border-slate-200/90">
+                          <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 shadow-[0_0_6px_rgba(79,70,229,0.4)]" />
+                          <span className="text-[11px] font-mono font-medium text-indigo-600 tracking-wide">
                             WEBP:{" "}
-                            <span className="text-emerald-300 font-semibold">
-                              {formatSize(selectedFile.convertedSize)}
+                            <span className="font-bold text-indigo-700">
+                              ({formatSize(selectedFile.convertedSize)})
                             </span>
                           </span>
                         </div>
@@ -1470,7 +1467,7 @@ export default function WebpStudioWorkbench() {
                     <div className="w-full h-full bg-slate-900 text-slate-200 rounded-xl p-4 overflow-y-auto font-mono text-xs space-y-4 [scrollbar-gutter:stable]">
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-slate-400 font-bold uppercase text-[10px]">
+                          <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">
                             HTML5 Picture Element
                           </span>
                           <button
@@ -1480,7 +1477,7 @@ export default function WebpStudioWorkbench() {
                                 "picture",
                               )
                             }
-                            className="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold cursor-pointer"
+                            className="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold cursor-pointer transition"
                           >
                             {copiedType === "picture"
                               ? "Copied!"
@@ -1497,7 +1494,7 @@ export default function WebpStudioWorkbench() {
 
                       <div>
                         <div className="flex items-center justify-between mb-2">
-                          <span className="text-slate-400 font-bold uppercase text-[10px]">
+                          <span className="text-slate-400 font-bold uppercase text-[10px] tracking-wider">
                             CSS Background
                           </span>
                           <button
@@ -1507,7 +1504,7 @@ export default function WebpStudioWorkbench() {
                                 "css",
                               )
                             }
-                            className="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold cursor-pointer"
+                            className="text-indigo-400 hover:text-indigo-300 text-[10px] font-bold cursor-pointer transition"
                           >
                             {copiedType === "css" ? "Copied!" : "Copy Snippet"}
                           </button>
@@ -1522,29 +1519,29 @@ export default function WebpStudioWorkbench() {
 
                 <div className="flex flex-wrap items-center justify-between gap-2 pt-1 shrink-0">
                   <div className="flex items-center gap-2 sm:gap-3 text-xs font-mono bg-slate-50 border border-slate-200 px-3 py-1.5 rounded-xl">
-                    <span className="text-slate-500">
+                    <span className="text-slate-500 font-medium">
                       Original:{" "}
-                      <strong className="text-slate-800">
+                      <strong className="text-slate-800 font-bold">
                         {formatSize(selectedFile.originalSize)}
                       </strong>
                     </span>
                     <span className="text-slate-300">|</span>
-                    <span className="text-slate-500">
+                    <span className="text-slate-500 font-medium">
                       WebP:{" "}
-                      <strong className="text-indigo-600">
+                      <strong className="text-indigo-600 font-bold">
                         {formatSize(selectedFile.convertedSize)}
                       </strong>
                     </span>
                     <span className="text-slate-300">|</span>
-                    <span className="text-slate-500">
+                    <span className="text-slate-500 font-medium">
                       Saved:{" "}
                       <strong
-                        className={
+                        className={`font-bold ${
                           selectedFile.originalSize >=
                           selectedFile.convertedSize
                             ? "text-emerald-700"
                             : "text-rose-600"
-                        }
+                        }`}
                       >
                         {formatSize(
                           Math.abs(
@@ -2149,7 +2146,7 @@ export default function WebpStudioWorkbench() {
                   <span className="font-bold text-slate-700 block">
                     Current Export Name:
                   </span>
-                  <span className="font-mono text-indigo-700 break-all">
+                  <span className="font-mono text-indigo-700 break-all font-semibold">
                     {selectedFile ? selectedFile.webpName : "No file active"}
                   </span>
                 </div>
