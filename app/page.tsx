@@ -400,7 +400,7 @@ export default function Page() {
                 </span>
               </Link>
 
-              <Link
+              {/* <Link
                 href="/heic-to-webp"
                 className="group p-3 rounded-xl bg-slate-50 hover:bg-indigo-50/70 border border-slate-200 hover:border-indigo-300 transition flex flex-col justify-between"
               >
@@ -413,7 +413,7 @@ export default function Page() {
                 <span className="text-[11px] text-slate-500 mt-1">
                   Apple iPhone photo exports
                 </span>
-              </Link>
+              </Link> */}
 
               <Link
                 href="/tiff-to-webp"

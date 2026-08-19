@@ -67,6 +67,21 @@ const DEFAULT_SETTINGS: ImageSettings = {
   grayscale: false,
 };
 
+const ACCEPTED_MIME_TYPES = [
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/bmp",
+  "image/webp",
+  "image/avif",
+  "image/tiff",
+  "image/tif",
+  "image/gif",
+];
+
+const ACCEPT_STRING =
+  "image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/avif, image/tiff, image/gif, .tiff, .tif, .gif";
+
 function resolveFileName(
   originalFileName: string,
   template: string,
@@ -92,6 +107,95 @@ function resolveFileName(
   return output;
 }
 
+// In-browser TIFF rasterizer fallback
+async function loadTiffCanvas(file: File): Promise<HTMLCanvasElement> {
+  if (typeof window !== "undefined" && !(window as any).UTIF) {
+    await new Promise<void>((resolve, reject) => {
+      const existing = document.querySelector('script[src*="UTIF.min.js"]');
+      if (existing) {
+        existing.addEventListener("load", () => resolve());
+        return;
+      }
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.min.js";
+      script.async = true;
+      script.onload = () => resolve();
+      script.onerror = () =>
+        reject(new Error("Failed to load TIFF decode engine"));
+      document.head.appendChild(script);
+    });
+  }
+
+  const UTIF = (window as any).UTIF;
+  const buffer = await file.arrayBuffer();
+  const ifds = UTIF.decode(buffer);
+  if (!ifds || ifds.length === 0) {
+    throw new Error("Unable to parse TIFF data");
+  }
+  UTIF.decodeImage(buffer, ifds[0]);
+  const rgba = UTIF.toRGBA8(ifds[0]);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = ifds[0].width;
+  canvas.height = ifds[0].height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas context initialization failed");
+
+  const imgData = ctx.createImageData(canvas.width, canvas.height);
+  imgData.data.set(rgba);
+  ctx.putImageData(imgData, 0, 0);
+
+  return canvas;
+}
+
+async function loadImageSource(
+  file: File,
+  fallbackUrl: string,
+): Promise<{
+  source: CanvasImageSource;
+  naturalWidth: number;
+  naturalHeight: number;
+  previewUrl: string;
+}> {
+  const isTiff =
+    file.type === "image/tiff" ||
+    file.type === "image/tif" ||
+    file.name.toLowerCase().endsWith(".tiff") ||
+    file.name.toLowerCase().endsWith(".tif");
+
+  if (isTiff) {
+    const tiffCanvas = await loadTiffCanvas(file);
+    const previewBlob = await new Promise<Blob | null>((res) =>
+      tiffCanvas.toBlob(res, "image/png"),
+    );
+    const previewUrl = previewBlob
+      ? URL.createObjectURL(previewBlob)
+      : fallbackUrl;
+
+    return {
+      source: tiffCanvas,
+      naturalWidth: tiffCanvas.width,
+      naturalHeight: tiffCanvas.height,
+      previewUrl,
+    };
+  }
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      resolve({
+        source: img,
+        naturalWidth: img.naturalWidth,
+        naturalHeight: img.naturalHeight,
+        previewUrl: fallbackUrl,
+      });
+    };
+    img.onerror = () =>
+      reject(new Error(`Failed to decode image ${file.name}`));
+    img.src = fallbackUrl;
+  });
+}
+
 async function encodeToWebP(
   file: File,
   originalUrl: string,
@@ -104,124 +208,111 @@ async function encodeToWebP(
   webpName: string;
   originalWidth: number;
   originalHeight: number;
+  previewUrl: string;
 }> {
+  const { source, naturalWidth, naturalHeight, previewUrl } =
+    await loadImageSource(file, originalUrl);
+
+  const isRotated90or270 =
+    settings.rotation === 90 || settings.rotation === 270;
+  const baseNaturalWidth = isRotated90or270 ? naturalHeight : naturalWidth;
+  const baseNaturalHeight = isRotated90or270 ? naturalWidth : naturalHeight;
+
+  let targetWidth = baseNaturalWidth * settings.scaleFactor;
+  let targetHeight = baseNaturalHeight * settings.scaleFactor;
+
+  if (settings.maxWidth > 0 && targetWidth > settings.maxWidth) {
+    if (settings.resizeMode === "contain") {
+      targetHeight = Math.round(
+        (targetHeight * settings.maxWidth) / targetWidth,
+      );
+      targetWidth = settings.maxWidth;
+    } else if (settings.resizeMode === "none") {
+      targetWidth = settings.maxWidth;
+    }
+  }
+
+  if (settings.maxHeight > 0 && targetHeight > settings.maxHeight) {
+    if (settings.resizeMode === "contain") {
+      targetWidth = Math.round(
+        (targetWidth * settings.maxHeight) / targetHeight,
+      );
+      targetHeight = settings.maxHeight;
+    } else if (settings.resizeMode === "none") {
+      targetHeight = settings.maxHeight;
+    }
+  }
+
+  targetWidth = Math.max(1, Math.round(targetWidth));
+  targetHeight = Math.max(1, Math.round(targetHeight));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = targetWidth;
+  canvas.height = targetHeight;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Canvas context initialization failed");
+
+  if (settings.alphaMode === "fill") {
+    ctx.fillStyle = settings.bgColor;
+    ctx.fillRect(0, 0, targetWidth, targetHeight);
+  }
+
+  const filters = [
+    `brightness(${settings.brightness}%)`,
+    `contrast(${settings.contrast}%)`,
+    settings.grayscale ? "grayscale(100%)" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  ctx.filter = filters || "none";
+
+  ctx.save();
+  ctx.translate(targetWidth / 2, targetHeight / 2);
+  ctx.rotate((settings.rotation * Math.PI) / 180);
+  ctx.scale(settings.flipH ? -1 : 1, settings.flipV ? -1 : 1);
+
+  const drawWidth = isRotated90or270 ? targetHeight : targetWidth;
+  const drawHeight = isRotated90or270 ? targetWidth : targetHeight;
+
+  ctx.drawImage(source, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+  ctx.restore();
+
+  const targetQuality = settings.isLossless ? 1.0 : settings.quality;
+
   return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => {
-      const isRotated90or270 =
-        settings.rotation === 90 || settings.rotation === 270;
-      const baseNaturalWidth = isRotated90or270
-        ? img.naturalHeight
-        : img.naturalWidth;
-      const baseNaturalHeight = isRotated90or270
-        ? img.naturalWidth
-        : img.naturalHeight;
-
-      let targetWidth = baseNaturalWidth * settings.scaleFactor;
-      let targetHeight = baseNaturalHeight * settings.scaleFactor;
-
-      if (settings.maxWidth > 0 && targetWidth > settings.maxWidth) {
-        if (settings.resizeMode === "contain") {
-          targetHeight = Math.round(
-            (targetHeight * settings.maxWidth) / targetWidth,
-          );
-          targetWidth = settings.maxWidth;
-        } else if (settings.resizeMode === "none") {
-          targetWidth = settings.maxWidth;
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          reject(new Error("WebP conversion failed"));
+          return;
         }
-      }
 
-      if (settings.maxHeight > 0 && targetHeight > settings.maxHeight) {
-        if (settings.resizeMode === "contain") {
-          targetWidth = Math.round(
-            (targetWidth * settings.maxHeight) / targetHeight,
-          );
-          targetHeight = settings.maxHeight;
-        } else if (settings.resizeMode === "none") {
-          targetHeight = settings.maxHeight;
-        }
-      }
+        const convertedUrl = URL.createObjectURL(blob);
+        const webpName = resolveFileName(
+          file.name,
+          settings.nameTemplate,
+          targetWidth,
+          targetHeight,
+          settings.quality,
+          settings.isLossless,
+        );
 
-      targetWidth = Math.max(1, Math.round(targetWidth));
-      targetHeight = Math.max(1, Math.round(targetHeight));
-
-      const canvas = document.createElement("canvas");
-      canvas.width = targetWidth;
-      canvas.height = targetHeight;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) {
-        reject(new Error("Canvas context initialization failed"));
-        return;
-      }
-
-      if (settings.alphaMode === "fill") {
-        ctx.fillStyle = settings.bgColor;
-        ctx.fillRect(0, 0, targetWidth, targetHeight);
-      }
-
-      const filters = [
-        `brightness(${settings.brightness}%)`,
-        `contrast(${settings.contrast}%)`,
-        settings.grayscale ? "grayscale(100%)" : "",
-      ]
-        .filter(Boolean)
-        .join(" ");
-
-      ctx.filter = filters || "none";
-
-      ctx.save();
-      ctx.translate(targetWidth / 2, targetHeight / 2);
-      ctx.rotate((settings.rotation * Math.PI) / 180);
-      ctx.scale(settings.flipH ? -1 : 1, settings.flipV ? -1 : 1);
-
-      const drawWidth = isRotated90or270 ? targetHeight : targetWidth;
-      const drawHeight = isRotated90or270 ? targetWidth : targetHeight;
-
-      ctx.drawImage(
-        img,
-        -drawWidth / 2,
-        -drawHeight / 2,
-        drawWidth,
-        drawHeight,
-      );
-      ctx.restore();
-
-      const targetQuality = settings.isLossless ? 1.0 : settings.quality;
-      canvas.toBlob(
-        (blob) => {
-          if (!blob) {
-            reject(new Error("WebP conversion failed"));
-            return;
-          }
-
-          const convertedUrl = URL.createObjectURL(blob);
-          const webpName = resolveFileName(
-            file.name,
-            settings.nameTemplate,
-            targetWidth,
-            targetHeight,
-            settings.quality,
-            settings.isLossless,
-          );
-
-          resolve({
-            convertedSize: blob.size,
-            convertedWidth: targetWidth,
-            convertedHeight: targetHeight,
-            convertedUrl,
-            webpName,
-            originalWidth: img.naturalWidth,
-            originalHeight: img.naturalHeight,
-          });
-        },
-        "image/webp",
-        targetQuality,
-      );
-    };
-
-    img.onerror = () => reject(new Error(`Failed to load ${file.name}`));
-    img.src = originalUrl;
+        resolve({
+          convertedSize: blob.size,
+          convertedWidth: targetWidth,
+          convertedHeight: targetHeight,
+          convertedUrl,
+          webpName,
+          originalWidth: naturalWidth,
+          originalHeight: naturalHeight,
+          previewUrl,
+        });
+      },
+      "image/webp",
+      targetQuality,
+    );
   });
 }
 
@@ -253,6 +344,7 @@ export default function WebpStudioWorkbench() {
 
   const activeEncodeIdRef = useRef<number>(0);
   const dragCounter = useRef<number>(0);
+  const filterDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedFile =
     files.find((f) => f.id === selectedFileId) || files[0] || null;
@@ -364,6 +456,45 @@ export default function WebpStudioWorkbench() {
     });
   };
 
+  // High-performance filter slider handler with debounce + instant commit
+  const handleFilterChange = (
+    key: "brightness" | "contrast",
+    value: number,
+  ) => {
+    if (!selectedFile) {
+      setGlobalDefaults((prev) => ({ ...prev, [key]: value }));
+      return;
+    }
+
+    const updatedSettings = { ...selectedFile.settings, [key]: value };
+
+    // Update state synchronously for 60 FPS slider movement
+    setFiles((prev) =>
+      prev.map((item) =>
+        item.id === selectedFile.id
+          ? { ...item, settings: updatedSettings }
+          : item,
+      ),
+    );
+
+    // Debounce background canvas re-encode during dragging
+    if (filterDebounceTimerRef.current) {
+      clearTimeout(filterDebounceTimerRef.current);
+    }
+    filterDebounceTimerRef.current = setTimeout(() => {
+      reprocessSpecificFile(selectedFile.id, updatedSettings);
+    }, 120);
+  };
+
+  const handleFilterCommit = () => {
+    if (!selectedFile) return;
+    if (filterDebounceTimerRef.current) {
+      clearTimeout(filterDebounceTimerRef.current);
+      filterDebounceTimerRef.current = null;
+    }
+    reprocessSpecificFile(selectedFile.id, selectedFile.settings);
+  };
+
   const updateSettingImmediate = <K extends keyof ImageSettings>(
     key: K,
     value: ImageSettings[K],
@@ -468,18 +599,12 @@ export default function WebpStudioWorkbench() {
       setIsProcessing(true);
       setProcessingProgress(0);
 
-      const validTypes = [
-        "image/png",
-        "image/jpeg",
-        "image/jpg",
-        "image/bmp",
-        "image/webp",
-        "image/avif",
-        "image/tiff",
-      ];
-
-      const fileArray = Array.from(uploadedFiles).filter((f) =>
-        validTypes.includes(f.type),
+      const fileArray = Array.from(uploadedFiles).filter(
+        (f) =>
+          ACCEPTED_MIME_TYPES.includes(f.type) ||
+          f.name.toLowerCase().endsWith(".tiff") ||
+          f.name.toLowerCase().endsWith(".tif") ||
+          f.name.toLowerCase().endsWith(".gif"),
       );
 
       if (fileArray.length === 0) {
@@ -499,12 +624,8 @@ export default function WebpStudioWorkbench() {
       const processedResults = await Promise.all(
         fileArray.map(async (file) => {
           try {
-            const originalUrl = URL.createObjectURL(file);
-            const result = await encodeToWebP(
-              file,
-              originalUrl,
-              initialSettings,
-            );
+            const rawUrl = URL.createObjectURL(file);
+            const result = await encodeToWebP(file, rawUrl, initialSettings);
 
             completedCount++;
             setProcessingProgress(
@@ -514,6 +635,10 @@ export default function WebpStudioWorkbench() {
               `Completed ${completedCount} of ${fileArray.length}`,
             );
 
+            const formatLabel =
+              file.name.split(".").pop()?.toUpperCase() ||
+              file.type.replace("image/", "").toUpperCase();
+
             const newFileItem: ConvertedFile = {
               id: Math.random().toString(36).substring(2, 9),
               rawFile: file,
@@ -521,13 +646,13 @@ export default function WebpStudioWorkbench() {
               originalSize: file.size,
               originalWidth: result.originalWidth,
               originalHeight: result.originalHeight,
-              originalUrl,
+              originalUrl: result.previewUrl,
               convertedSize: result.convertedSize,
               convertedWidth: result.convertedWidth,
               convertedHeight: result.convertedHeight,
               convertedUrl: result.convertedUrl,
               webpName: result.webpName,
-              format: file.type.replace("image/", "").toUpperCase(),
+              format: formatLabel,
               settings: { ...initialSettings },
             };
 
@@ -586,7 +711,6 @@ export default function WebpStudioWorkbench() {
     link.click();
     URL.revokeObjectURL(zipUrl);
 
-    // Trigger custom Google Analytics event for batch download
     trackEvent("download_zip", {
       file_count: downloadQueue.length,
       total_savings_bytes: totalSavedBytes,
@@ -733,7 +857,6 @@ export default function WebpStudioWorkbench() {
                   fill="none"
                   stroke="currentColor"
                 >
-                  {/* Subtle Track */}
                   <circle
                     className="opacity-20"
                     cx="12"
@@ -741,7 +864,6 @@ export default function WebpStudioWorkbench() {
                     r="9"
                     strokeWidth="2.5"
                   />
-                  {/* Spinning Arc */}
                   <path
                     d="M12 3a9 9 0 0 1 9 9"
                     strokeWidth="2.5"
@@ -778,9 +900,7 @@ export default function WebpStudioWorkbench() {
       )}
 
       {/* Top Application Header */}
-      {/* Top Application Header */}
       <header className="min-h-14 border-b border-slate-200 bg-white/90 backdrop-blur-xl px-3.5 sm:px-5 lg:px-6 py-2.5 lg:py-0 flex flex-wrap items-center justify-between shrink-0 z-30 shadow-xs gap-y-2.5 gap-x-6">
-        {/* Left: Logo & Title with 2-line mobile subheader */}
         <div className="flex items-center gap-3 shrink-0 min-w-0">
           <Link
             href="/"
@@ -799,7 +919,6 @@ export default function WebpStudioWorkbench() {
             <h1 className="font-bold text-xs sm:text-sm text-slate-900 leading-tight truncate">
               WebP Studio
             </h1>
-            {/* Mobile: 2-line stacked micro font | Desktop: 1-line clean font */}
             <div className="text-[9px] sm:text-[10px] text-slate-500 font-mono mt-0.5 leading-[1.15] sm:leading-tight">
               <span className="block sm:inline">
                 In-Browser WebP Conversion
@@ -850,7 +969,7 @@ export default function WebpStudioWorkbench() {
           )}
         </div>
 
-        {/* Center / Bottom on Mobile: Global Batch Size Summary with extra breathing room */}
+        {/* Global Batch Size Summary */}
         {files.length > 0 && (
           <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2.5 sm:gap-3.5 bg-slate-100/90 border border-slate-200/90 px-3 py-1.5 rounded-xl shrink-0 order-3 lg:order-2 lg:mx-auto">
             <div className="flex items-center gap-2 sm:gap-2.5 text-xs">
@@ -958,7 +1077,7 @@ export default function WebpStudioWorkbench() {
                 <input
                   type="file"
                   multiple
-                  accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/avif, image/tiff"
+                  accept={ACCEPT_STRING}
                   className="hidden"
                   onChange={(e) =>
                     e.target.files && handleFiles(e.target.files)
@@ -1005,7 +1124,7 @@ export default function WebpStudioWorkbench() {
                   <input
                     type="file"
                     multiple
-                    accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/avif, image/tiff"
+                    accept={ACCEPT_STRING}
                     className="hidden"
                     onChange={(e) =>
                       e.target.files && handleFiles(e.target.files)
@@ -1055,12 +1174,12 @@ export default function WebpStudioWorkbench() {
                   Add or Drop Files
                 </span>
                 <span className="text-[10px] text-slate-500 mt-1 max-w-[180px]">
-                  PNG, JPG, BMP, AVIF, TIFF
+                  PNG, JPG, BMP, AVIF, GIF, TIFF
                 </span>
                 <input
                   type="file"
                   multiple
-                  accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/avif, image/tiff"
+                  accept={ACCEPT_STRING}
                   className="hidden"
                   onChange={(e) =>
                     e.target.files && handleFiles(e.target.files)
@@ -1234,7 +1353,6 @@ export default function WebpStudioWorkbench() {
                       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden [transform:translateZ(0)] transition-transform duration-150"
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
-                      {/* Left Badge: Original (Frosted White Glass) */}
                       <div className="absolute top-2 left-2 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50/50 backdrop-blur-md border border-white/60 shadow-xs ring-1 ring-slate-900/5">
                         <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
                         <span className="text-[10px] font-mono font-extrabold text-slate-800 tracking-wide">
@@ -1245,7 +1363,6 @@ export default function WebpStudioWorkbench() {
                         </span>
                       </div>
 
-                      {/* Right Badge: WebP (Frosted Indigo-Tinted Glass) */}
                       <div className="absolute top-2 right-2 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50/50 backdrop-blur-md border border-indigo-200/70 shadow-xs ring-1 ring-indigo-500/10">
                         <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 shadow-[0_0_6px_rgba(79,70,229,0.5)]" />
                         <span className="text-[10px] font-mono font-extrabold text-indigo-950 tracking-wide">
@@ -1442,7 +1559,6 @@ export default function WebpStudioWorkbench() {
                 </div>
               </>
             ) : (
-              /* Clickable Empty State for File Uploads */
               <label className="flex-1 border-2 border-dashed border-slate-200 hover:border-indigo-400 bg-slate-50/70 hover:bg-slate-50 rounded-xl p-8 flex flex-col items-center justify-center text-center cursor-pointer transition h-full group select-none">
                 <div className="w-16 h-16 rounded-2xl bg-white border border-slate-200 text-indigo-600 flex items-center justify-center mb-3 shadow-2xs group-hover:scale-110 transition-transform">
                   <svg
@@ -1463,7 +1579,7 @@ export default function WebpStudioWorkbench() {
                   Click to Select or Drop Images
                 </span>
                 <span className="text-xs text-slate-500 mt-1 max-w-[260px]">
-                  Supports PNG, JPG, BMP, AVIF, and TIFF with zero server
+                  Supports PNG, JPG, BMP, AVIF, GIF, and TIFF with zero server
                   uploads
                 </span>
                 <span className="mt-4 px-3.5 py-1.5 bg-white border border-slate-200 group-hover:border-indigo-200 group-hover:bg-indigo-50/50 text-indigo-600 rounded-lg text-xs font-semibold shadow-2xs transition">
@@ -1472,7 +1588,7 @@ export default function WebpStudioWorkbench() {
                 <input
                   type="file"
                   multiple
-                  accept="image/png, image/jpeg, image/jpg, image/bmp, image/webp, image/avif, image/tiff"
+                  accept={ACCEPT_STRING}
                   className="hidden"
                   onChange={(e) =>
                     e.target.files && handleFiles(e.target.files)
@@ -1548,7 +1664,6 @@ export default function WebpStudioWorkbench() {
             }`}
             style={{ overscrollBehavior: "contain" }}
           >
-            {/* Header info & Tabs */}
             <div className="border-b border-slate-100 pb-3">
               <div className="flex items-center justify-between mb-2.5">
                 <div className="overflow-hidden min-w-0 pr-2">
@@ -1874,12 +1989,11 @@ export default function WebpStudioWorkbench() {
                     max="180"
                     value={activeSettings.brightness}
                     onChange={(e) =>
-                      updateSettingImmediate(
-                        "brightness",
-                        Number(e.target.value),
-                      )
+                      handleFilterChange("brightness", Number(e.target.value))
                     }
-                    className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none"
+                    onPointerUp={handleFilterCommit}
+                    onKeyUp={handleFilterCommit}
+                    className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none touch-none"
                   />
                 </div>
 
@@ -1896,9 +2010,11 @@ export default function WebpStudioWorkbench() {
                     max="180"
                     value={activeSettings.contrast}
                     onChange={(e) =>
-                      updateSettingImmediate("contrast", Number(e.target.value))
+                      handleFilterChange("contrast", Number(e.target.value))
                     }
-                    className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none"
+                    onPointerUp={handleFilterCommit}
+                    onKeyUp={handleFilterCommit}
+                    className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none touch-none"
                   />
                 </div>
 
