@@ -1353,21 +1353,23 @@ export default function WebpStudioWorkbench() {
                       className="relative w-full h-full flex items-center justify-center select-none overflow-hidden [transform:translateZ(0)] transition-transform duration-150"
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
-                      <div className="absolute top-2 left-2 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50/50 backdrop-blur-md border border-white/60 shadow-xs ring-1 ring-slate-900/5">
-                        <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
-                        <span className="text-[10px] font-mono font-extrabold text-slate-800 tracking-wide">
-                          ORIGINAL{" "}
-                          <span className="text-slate-500 font-extrabold">
+                      {/* Left Badge: Original (Electric Violet) */}
+                      <div className="absolute top-3 left-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-violet-950/90 text-violet-100 backdrop-blur-md shadow-xl border border-violet-500/40">
+                        <span className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
+                        <span className="text-[11px] font-mono font-bold tracking-wide">
+                          Original {selectedFile.format}:{" "}
+                          <span className="text-violet-300 font-medium">
                             ({formatSize(selectedFile.originalSize)})
                           </span>
                         </span>
                       </div>
 
-                      <div className="absolute top-2 right-2 z-30 pointer-events-none flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-indigo-50/50 backdrop-blur-md border border-indigo-200/70 shadow-xs ring-1 ring-indigo-500/10">
-                        <span className="w-2 h-2 rounded-full bg-indigo-600 shrink-0 shadow-[0_0_6px_rgba(79,70,229,0.5)]" />
-                        <span className="text-[10px] font-mono font-extrabold text-indigo-950 tracking-wide">
+                      {/* Right Badge: WebP (Cyber Emerald) */}
+                      <div className="absolute top-3 right-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/90 text-emerald-100 backdrop-blur-md shadow-xl border border-emerald-500/40">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                        <span className="text-[11px] font-mono font-bold tracking-wide">
                           WEBP{" "}
-                          <span className="text-indigo-600 font-extrabold">
+                          <span className="text-emerald-300 font-semibold">
                             ({formatSize(selectedFile.convertedSize)})
                           </span>
                         </span>
@@ -1413,11 +1415,18 @@ export default function WebpStudioWorkbench() {
                       className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full h-full transition-transform duration-150"
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
+                      {/* Left Box: Original */}
                       <div className="relative flex flex-col items-center justify-center bg-white rounded-xl p-2 border border-slate-200 h-full overflow-hidden">
-                        <span className="absolute top-2 left-2 bg-slate-800 text-white text-[9px] font-mono px-2 py-0.5 rounded z-10">
-                          {selectedFile.format}:{" "}
-                          {formatSize(selectedFile.originalSize)}
-                        </span>
+                        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-violet-950/90 text-violet-100 backdrop-blur-md shadow-xl border border-violet-500/40">
+                          <span className="w-2 h-2 rounded-full bg-violet-400 shrink-0" />
+                          <span className="text-[11px] font-mono font-bold tracking-wide">
+                            Original {selectedFile.format}:{" "}
+                            <span className="text-violet-300 font-medium">
+                              {formatSize(selectedFile.originalSize)}
+                            </span>
+                          </span>
+                        </div>
+
                         <img
                           src={selectedFile.originalUrl}
                           alt="Original"
@@ -1425,10 +1434,18 @@ export default function WebpStudioWorkbench() {
                         />
                       </div>
 
+                      {/* Right Box: WebP */}
                       <div className="relative flex flex-col items-center justify-center bg-white rounded-xl p-2 border border-slate-200 h-full overflow-hidden">
-                        <span className="absolute top-2 left-2 bg-indigo-600 text-white text-[9px] font-mono px-2 py-0.5 rounded z-10">
-                          WEBP: {formatSize(selectedFile.convertedSize)}
-                        </span>
+                        <div className="absolute top-3 left-3 z-10 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-950/90 text-emerald-100 backdrop-blur-md shadow-xl border border-emerald-500/40">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                          <span className="text-[11px] font-mono font-bold tracking-wide">
+                            WEBP:{" "}
+                            <span className="text-emerald-300 font-semibold">
+                              {formatSize(selectedFile.convertedSize)}
+                            </span>
+                          </span>
+                        </div>
+
                         <img
                           src={selectedFile.convertedUrl}
                           alt="Converted WebP"
