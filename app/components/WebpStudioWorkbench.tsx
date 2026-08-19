@@ -7,7 +7,7 @@ import Link from "next/link";
 import { trackEvent } from "../lib/gtag";
 import KofiFloatingButton from "./KofiFloatingButton";
 
-export type Preset = "balanced" | "ultra" | "lossless" | "custom";
+export type Preset = "balanced" | "ultra" | "lossless" | "target" | "custom";
 export type ResizeMode = "contain" | "cover" | "none";
 export type AlphaMode = "transparent" | "fill";
 export type TuningTab = "compression" | "transform" | "filters" | "export";
@@ -16,6 +16,7 @@ export interface ImageSettings {
   preset: Preset;
   quality: number;
   isLossless: boolean;
+  targetSizeKb: number; // 0 = disabled, >0 = target file size limit
   maxWidth: number;
   maxHeight: number;
   resizeMode: ResizeMode;
@@ -52,6 +53,7 @@ const DEFAULT_SETTINGS: ImageSettings = {
   preset: "balanced",
   quality: 0.8,
   isLossless: false,
+  targetSizeKb: 0,
   maxWidth: 1920,
   maxHeight: 0,
   resizeMode: "contain",
@@ -196,6 +198,48 @@ async function loadImageSource(
   });
 }
 
+function getCanvasWebpBlob(
+  canvas: HTMLCanvasElement,
+  quality: number,
+): Promise<Blob | null> {
+  return new Promise((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), "image/webp", quality);
+  });
+}
+
+// Binary search on WebP quality to find highest quality under target size (KB)
+async function findOptimalWebpQuality(
+  canvas: HTMLCanvasElement,
+  targetBytes: number,
+): Promise<{ blob: Blob; quality: number }> {
+  let low = 0.05;
+  let high = 1.0;
+  let bestBlob: Blob | null = null;
+  let bestQuality = low;
+
+  for (let i = 0; i < 6; i++) {
+    const mid = (low + high) / 2;
+    const blob = await getCanvasWebpBlob(canvas, mid);
+
+    if (!blob) break;
+
+    if (blob.size <= targetBytes) {
+      bestBlob = blob;
+      bestQuality = mid;
+      low = mid; // Try higher quality
+    } else {
+      high = mid; // Must lower quality
+    }
+  }
+
+  if (!bestBlob) {
+    bestBlob = (await getCanvasWebpBlob(canvas, low)) || new Blob();
+    bestQuality = low;
+  }
+
+  return { blob: bestBlob, quality: bestQuality };
+}
+
 async function encodeToWebP(
   file: File,
   originalUrl: string,
@@ -209,6 +253,7 @@ async function encodeToWebP(
   originalWidth: number;
   originalHeight: number;
   previewUrl: string;
+  effectiveQuality: number;
 }> {
   const { source, naturalWidth, naturalHeight, previewUrl } =
     await loadImageSource(file, originalUrl);
@@ -279,41 +324,46 @@ async function encodeToWebP(
   ctx.drawImage(source, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
   ctx.restore();
 
-  const targetQuality = settings.isLossless ? 1.0 : settings.quality;
+  let finalBlob: Blob | null = null;
+  let effectiveQuality = settings.isLossless ? 1.0 : settings.quality;
 
-  return new Promise((resolve, reject) => {
-    canvas.toBlob(
-      (blob) => {
-        if (!blob) {
-          reject(new Error("WebP conversion failed"));
-          return;
-        }
-
-        const convertedUrl = URL.createObjectURL(blob);
-        const webpName = resolveFileName(
-          file.name,
-          settings.nameTemplate,
-          targetWidth,
-          targetHeight,
-          settings.quality,
-          settings.isLossless,
-        );
-
-        resolve({
-          convertedSize: blob.size,
-          convertedWidth: targetWidth,
-          convertedHeight: targetHeight,
-          convertedUrl,
-          webpName,
-          originalWidth: naturalWidth,
-          originalHeight: naturalHeight,
-          previewUrl,
-        });
-      },
-      "image/webp",
-      targetQuality,
+  // Binary search optimization if Target File Size limit is enabled
+  if (settings.targetSizeKb > 0 && settings.preset === "target") {
+    const result = await findOptimalWebpQuality(
+      canvas,
+      settings.targetSizeKb * 1024,
     );
-  });
+    finalBlob = result.blob;
+    effectiveQuality = result.quality;
+  } else {
+    finalBlob = await getCanvasWebpBlob(canvas, effectiveQuality);
+  }
+
+  if (!finalBlob) {
+    throw new Error("WebP conversion failed");
+  }
+
+  const convertedUrl = URL.createObjectURL(finalBlob);
+  const webpName = resolveFileName(
+    file.name,
+    settings.nameTemplate,
+    targetWidth,
+    targetHeight,
+    effectiveQuality,
+    settings.isLossless,
+  );
+
+  return {
+    convertedSize: finalBlob.size,
+    convertedWidth: targetWidth,
+    convertedHeight: targetHeight,
+    convertedUrl,
+    webpName,
+    originalWidth: naturalWidth,
+    originalHeight: naturalHeight,
+    previewUrl,
+    effectiveQuality,
+  };
 }
 
 export default function WebpStudioWorkbench() {
@@ -342,9 +392,14 @@ export default function WebpStudioWorkbench() {
     "picture" | "css" | "img" | null
   >(null);
 
+  // Dedicated loading state for Lossless and Target size optimization
+  const [isLosslessLoading, setIsLosslessLoading] = useState<boolean>(false);
+  const [isTargetOptimizing, setIsTargetOptimizing] = useState<boolean>(false);
+
   const activeEncodeIdRef = useRef<number>(0);
   const dragCounter = useRef<number>(0);
   const filterDebounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const targetSizeDebounceRef = useRef<NodeJS.Timeout | null>(null);
 
   const selectedFile =
     files.find((f) => f.id === selectedFileId) || files[0] || null;
@@ -424,6 +479,8 @@ export default function WebpStudioWorkbench() {
         ...prev,
         preset: "custom",
         quality: val,
+        isLossless: false,
+        targetSizeKb: 0,
       }));
       return;
     }
@@ -433,14 +490,20 @@ export default function WebpStudioWorkbench() {
         item.id === selectedFile.id
           ? {
               ...item,
-              settings: { ...item.settings, preset: "custom", quality: val },
+              settings: {
+                ...item.settings,
+                preset: "custom",
+                quality: val,
+                isLossless: false,
+                targetSizeKb: 0,
+              },
               webpName: resolveFileName(
                 item.originalName,
                 item.settings.nameTemplate,
                 item.convertedWidth,
                 item.convertedHeight,
                 val,
-                item.settings.isLossless,
+                false,
               ),
             }
           : item,
@@ -453,7 +516,51 @@ export default function WebpStudioWorkbench() {
     reprocessSpecificFile(selectedFile.id, {
       ...selectedFile.settings,
       preset: "custom",
+      isLossless: false,
+      targetSizeKb: 0,
     });
+  };
+
+  const handleTargetSizeChange = (kb: number) => {
+    if (!selectedFile) {
+      setGlobalDefaults((prev) => ({
+        ...prev,
+        preset: "target",
+        targetSizeKb: kb,
+        isLossless: false,
+      }));
+      return;
+    }
+
+    const updatedSettings: ImageSettings = {
+      ...selectedFile.settings,
+      preset: "target",
+      targetSizeKb: kb,
+      isLossless: false,
+    };
+
+    setFiles((prev) =>
+      prev.map((item) =>
+        item.id === selectedFile.id
+          ? { ...item, settings: updatedSettings }
+          : item,
+      ),
+    );
+
+    if (targetSizeDebounceRef.current) {
+      clearTimeout(targetSizeDebounceRef.current);
+    }
+
+    if (kb > 0) {
+      setIsTargetOptimizing(true);
+      targetSizeDebounceRef.current = setTimeout(async () => {
+        try {
+          await reprocessSpecificFile(selectedFile.id, updatedSettings);
+        } finally {
+          setIsTargetOptimizing(false);
+        }
+      }, 300);
+    }
   };
 
   const handleFilterChange = (
@@ -505,13 +612,48 @@ export default function WebpStudioWorkbench() {
     reprocessSpecificFile(selectedFile.id, updatedSettings);
   };
 
-  const applyPresetToFile = (p: Preset) => {
+  const applyPresetToFile = async (p: Preset) => {
     if (!selectedFile) {
-      setGlobalDefaults((prev) => ({ ...prev, preset: p }));
+      let nextDefaults = { ...globalDefaults, preset: p, targetSizeKb: 0 };
+      if (p === "balanced") {
+        nextDefaults = {
+          ...nextDefaults,
+          quality: 0.8,
+          isLossless: false,
+          maxWidth: 1920,
+          scaleFactor: 1,
+        };
+      } else if (p === "ultra") {
+        nextDefaults = {
+          ...nextDefaults,
+          quality: 0.5,
+          isLossless: false,
+          maxWidth: 1280,
+          scaleFactor: 1,
+        };
+      } else if (p === "lossless") {
+        nextDefaults = {
+          ...nextDefaults,
+          quality: 1.0,
+          isLossless: true,
+          maxWidth: 0,
+          scaleFactor: 1,
+        };
+      } else if (p === "custom") {
+        nextDefaults = {
+          ...nextDefaults,
+          quality:
+            globalDefaults.quality === 1.0 && globalDefaults.isLossless
+              ? 0.8
+              : globalDefaults.quality,
+          isLossless: false,
+        };
+      }
+      setGlobalDefaults(nextDefaults);
       return;
     }
 
-    let nextSettings = { ...selectedFile.settings, preset: p };
+    let nextSettings = { ...selectedFile.settings, preset: p, targetSizeKb: 0 };
     if (p === "balanced") {
       nextSettings = {
         ...nextSettings,
@@ -536,8 +678,36 @@ export default function WebpStudioWorkbench() {
         maxWidth: 0,
         scaleFactor: 1,
       };
+    } else if (p === "custom") {
+      nextSettings = {
+        ...nextSettings,
+        quality:
+          selectedFile.settings.isLossless &&
+          selectedFile.settings.quality === 1.0
+            ? 0.8
+            : selectedFile.settings.quality,
+        isLossless: false,
+      };
     }
-    reprocessSpecificFile(selectedFile.id, nextSettings);
+
+    setFiles((prev) =>
+      prev.map((item) =>
+        item.id === selectedFile.id
+          ? { ...item, settings: nextSettings }
+          : item,
+      ),
+    );
+
+    if (p === "lossless") {
+      setIsLosslessLoading(true);
+      try {
+        await reprocessSpecificFile(selectedFile.id, nextSettings);
+      } finally {
+        setIsLosslessLoading(false);
+      }
+    } else {
+      reprocessSpecificFile(selectedFile.id, nextSettings);
+    }
   };
 
   const applyDimensionPreset = (w: number, h: number) => {
@@ -1351,7 +1521,7 @@ export default function WebpStudioWorkbench() {
                       style={{ transform: `scale(${zoomLevel})` }}
                     >
                       {/* Left Badge: Original */}
-                      <div className="absolute  top-3 left-0 sm:left-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 backdrop-blur-md shadow-md border border-slate-200/90">
+                      <div className="absolute top-3 left-0 sm:left-3 z-30 pointer-events-none flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100/90 backdrop-blur-md shadow-md border border-slate-200/90">
                         <span className="w-2 h-2 rounded-full bg-slate-400 shrink-0" />
                         <span className="text-[11px] font-mono font-medium text-slate-600 tracking-wide">
                           Original {selectedFile.format}:{" "}
@@ -1778,45 +1948,154 @@ export default function WebpStudioWorkbench() {
                       { id: "ultra", name: "Ultra (50%)" },
                       { id: "lossless", name: "Lossless (1:1)" },
                       { id: "custom", name: "Custom Slider" },
-                    ].map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => applyPresetToFile(item.id as Preset)}
-                        className={`py-1.5 text-[11px] font-bold rounded-lg border transition cursor-pointer ${
-                          activeSettings.preset === item.id
-                            ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
-                            : "bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300"
-                        }`}
-                      >
-                        {item.name}
-                      </button>
-                    ))}
+                    ].map((item) => {
+                      const isThisLossless = item.id === "lossless";
+                      const isLoading = isThisLossless && isLosslessLoading;
+                      const isCurrentActive = activeSettings.preset === item.id;
+
+                      return (
+                        <button
+                          key={item.id}
+                          disabled={isLosslessLoading}
+                          onClick={() => applyPresetToFile(item.id as Preset)}
+                          className={`py-1.5 px-2 text-[11px] font-bold rounded-lg border transition cursor-pointer flex items-center justify-center gap-1.5 ${
+                            isCurrentActive
+                              ? "bg-indigo-600 text-white border-indigo-600 shadow-2xs"
+                              : "bg-slate-50 text-slate-600 border-slate-200 hover:border-slate-300"
+                          } ${
+                            isLosslessLoading && !isThisLossless
+                              ? "opacity-60 cursor-not-allowed"
+                              : ""
+                          }`}
+                        >
+                          {isLoading && (
+                            <svg
+                              className={`w-3.5 h-3.5 animate-spin ${
+                                isCurrentActive
+                                  ? "text-white"
+                                  : "text-indigo-600"
+                              }`}
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                            >
+                              <circle
+                                className="opacity-25"
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                strokeWidth="4"
+                              />
+                              <path
+                                className="opacity-75"
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                              />
+                            </svg>
+                          )}
+                          <span>{isLoading ? "Encoding..." : item.name}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {!activeSettings.isLossless && (
-                  <div className="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
-                    <div className="flex justify-between text-xs">
-                      <span className="text-slate-600 font-medium">
-                        Quality Percentage
-                      </span>
-                      <span className="font-mono text-indigo-600 font-bold">
-                        {Math.round(activeSettings.quality * 100)}%
-                      </span>
+                {!activeSettings.isLossless &&
+                  activeSettings.preset !== "target" && (
+                    <div className="space-y-1.5 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                      <div className="flex justify-between text-xs">
+                        <span className="text-slate-600 font-medium">
+                          Quality Percentage
+                        </span>
+                        <span className="font-mono text-indigo-600 font-bold">
+                          {Math.round(activeSettings.quality * 100)}%
+                        </span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0.05"
+                        max="1.0"
+                        step="0.01"
+                        value={activeSettings.quality}
+                        onChange={handleQualityChange}
+                        onPointerUp={handleQualityCommit}
+                        onKeyUp={handleQualityCommit}
+                        className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none touch-none"
+                      />
                     </div>
-                    <input
-                      type="range"
-                      min="0.05"
-                      max="1.0"
-                      step="0.01"
-                      value={activeSettings.quality}
-                      onChange={handleQualityChange}
-                      onPointerUp={handleQualityCommit}
-                      onKeyUp={handleQualityCommit}
-                      className="w-full accent-indigo-600 cursor-pointer h-1.5 bg-slate-200 rounded-lg appearance-none touch-none"
-                    />
+                  )}
+
+                {/* Full-width Divider */}
+                <div className="relative flex items-center justify-center my-3">
+                  <div className="w-full border-t border-slate-200" />
+                  <span className="absolute bg-white px-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                    or
+                  </span>
+                </div>
+
+                {/* Target File Size Optimizer Mode */}
+                <div className="space-y-2 bg-indigo-50/50 p-2.5 rounded-xl border border-indigo-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-slate-700">
+                      Target File Size Mode
+                    </span>
+                    <span className="text-[10px] font-mono font-bold text-indigo-600">
+                      {activeSettings.preset === "target" &&
+                      activeSettings.targetSizeKb > 0
+                        ? `Max ${activeSettings.targetSizeKb} KB`
+                        : "Disabled"}
+                    </span>
                   </div>
-                )}
+
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      min="5"
+                      max="50000"
+                      value={activeSettings.targetSizeKb || ""}
+                      onChange={(e) =>
+                        handleTargetSizeChange(Number(e.target.value))
+                      }
+                      placeholder="e.g. 150"
+                      className="flex-1 px-2.5 py-1 bg-white border border-slate-200 rounded-lg font-mono text-slate-800 focus:outline-none focus:border-indigo-500 text-xs"
+                    />
+                    <span className="text-xs font-mono font-bold text-slate-500">
+                      KB
+                    </span>
+                    {activeSettings.preset === "target" && (
+                      <button
+                        onClick={() => applyPresetToFile("balanced")}
+                        className="text-[10px] font-bold text-rose-500 hover:text-rose-600 px-2 py-1 bg-white rounded-lg border border-slate-200 cursor-pointer"
+                      >
+                        Reset
+                      </button>
+                    )}
+                  </div>
+                  {isTargetOptimizing && (
+                    <div className="flex items-center gap-1.5 text-[10px] font-mono text-indigo-600 font-semibold">
+                      <svg
+                        className="w-3 h-3 animate-spin"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          strokeWidth="4"
+                        />
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                        />
+                      </svg>
+                      <span>Finding optimal quality...</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
