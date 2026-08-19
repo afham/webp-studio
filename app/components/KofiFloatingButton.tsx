@@ -16,10 +16,28 @@ export default function KofiFloatingButton({
   return (
     <>
       <style>{`
+        /* 1. Position the main wrapper to the bottom-right */
         .floatingchat-container-wrap,
         .floatingchat-container-wrap-mobi {
-          left: unset !important;
+          left: auto !important;
           right: 16px !important;
+          margin: 0 !important;
+        }
+
+        /* 2. Keep the popup container aligned inside the wrapper */
+        .floating-chat-kofi-popup-iframe-container,
+        .floating-chat-kofi-popup-iframe-container-mobi {
+          left: auto !important;
+          right: 0 !important;
+          margin: 0 !important;
+          transform: none !important;
+        }
+
+        /* 3. Ensure the iframe stays within viewport width on mobile */
+        .floating-chat-kofi-popup-iframe {
+          left: auto !important;
+          right: 16px !important;
+          max-width: calc(100vw - 32px) !important;
         }
       `}</style>
       <Script
