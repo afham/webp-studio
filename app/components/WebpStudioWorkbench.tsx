@@ -1400,11 +1400,22 @@ export default function WebpStudioWorkbench() {
                       />
 
                       <div
-                        className="absolute top-0 bottom-0 w-0.5 bg-indigo-600 z-20 pointer-events-none [transform:translateZ(0)]"
+                        className="absolute top-0 bottom-0 w-0.5 bg-indigo-600 z-20 pointer-events-none [transform:translateZ(0)] shadow-[0_0_8px_rgba(79,70,229,0.6)]"
                         style={{ left: `${sliderPos}%` }}
                       >
-                        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-md text-xs font-bold border border-white">
-                          <span className="-translate-y-1 scale-150">↔</span>
+                        <div className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-8 h-8 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                          <svg
+                            className="w-4 h-4 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            viewBox="0 0 24 24"
+                          >
+                            <polyline points="8 17 3 12 8 7" />
+                            <polyline points="16 7 21 12 16 17" />
+                          </svg>
                         </div>
                       </div>
                     </div>
